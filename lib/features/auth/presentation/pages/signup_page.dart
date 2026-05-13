@@ -9,6 +9,8 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/dimensions.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../core/widgets/auth_language_dropdown.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -81,14 +83,11 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Future<void> _sendOtp() async {
+    final l10n = AppLocalizations.of(context)!;
     final phoneNorm = normalizeEthiopiaPhone(_phoneController.text);
     if (phoneNorm == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Enter a valid phone before requesting OTP.',
-          ),
-        ),
+        SnackBar(content: Text(l10n.signupEnterValidPhoneOtp)),
       );
       return;
     }
@@ -113,14 +112,15 @@ class _SignupPageState extends State<SignupPage> {
               _verifiedFirebaseIdToken = idToken;
             });
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Phone number verified automatically.')),
+              SnackBar(content: Text(AppLocalizations.of(context)!.signupPhoneVerifiedAutomatic)),
             );
           } catch (_) {}
         },
         verificationFailed: (e) {
           if (!mounted) return;
+          final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message ?? 'Failed to send OTP.')),
+            SnackBar(content: Text(e.message ?? l10n.signupFailedSendOtp)),
           );
         },
         codeSent: (verificationId, resendToken) {
@@ -134,7 +134,7 @@ class _SignupPageState extends State<SignupPage> {
             _verifiedFirebaseIdToken = null;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('OTP sent. Check your SMS.')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.signupOtpSentCheckSms)),
           );
         },
         codeAutoRetrievalTimeout: (verificationId) {
@@ -144,8 +144,9 @@ class _SignupPageState extends State<SignupPage> {
       );
     } catch (e) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('OTP setup failed: $e')),
+        SnackBar(content: Text(l10n.signupOtpSetupFailed(e.toString()))),
       );
     } finally {
       if (mounted) setState(() => _sendingOtp = false);
@@ -153,24 +154,25 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Future<void> _verifyOtp() async {
+    final l10n = AppLocalizations.of(context)!;
     final code = _otpController.text.trim();
     final verificationId = _verificationId;
     final phoneNorm = normalizeEthiopiaPhone(_phoneController.text);
     if (verificationId == null || verificationId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Request OTP first.')),
+        SnackBar(content: Text(l10n.signupRequestOtpFirst)),
       );
       return;
     }
     if (phoneNorm == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid phone number.')),
+        SnackBar(content: Text(l10n.signupEnterValidPhone)),
       );
       return;
     }
     if (code.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter the 6-digit OTP code.')),
+        SnackBar(content: Text(l10n.signupEnterSixDigitOtp)),
       );
       return;
     }
@@ -191,12 +193,12 @@ class _SignupPageState extends State<SignupPage> {
         _verifiedFirebaseIdToken = idToken;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('OTP verified successfully.')),
+        SnackBar(content: Text(l10n.signupOtpVerifiedSuccess)),
       );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Invalid OTP code.')),
+        SnackBar(content: Text(e.message ?? l10n.signupInvalidOtp)),
       );
     } finally {
       if (mounted) setState(() => _verifyingOtp = false);
@@ -204,43 +206,38 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void _submit() {
+    final l10n = AppLocalizations.of(context)!;
     final password = _passwordController.text;
     final confirm = _confirmPasswordController.text;
     if (password != confirm) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
+        SnackBar(content: Text(l10n.signupPasswordsMismatch)),
       );
       return;
     }
     if (password.length < 8) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password must be at least 8 characters')),
+        SnackBar(content: Text(l10n.signupPasswordMin8)),
       );
       return;
     }
     final phoneNorm = normalizeEthiopiaPhone(_phoneController.text);
     if (phoneNorm == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Enter a valid phone: 09…, 251…, or +251… (9-digit mobile).',
-          ),
-        ),
+        SnackBar(content: Text(l10n.signupPhoneInvalidSnackbar)),
       );
       return;
     }
     if (!_otpVerified || _verifiedPhone != phoneNorm) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Verify your phone with OTP before signup.')),
+        SnackBar(content: Text(l10n.signupVerifyPhoneBeforeSignup)),
       );
       return;
     }
     final firebaseIdToken = _verifiedFirebaseIdToken?.trim();
     if (firebaseIdToken == null || firebaseIdToken.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Phone verified, but Firebase token is missing. Verify OTP again.'),
-        ),
+        SnackBar(content: Text(l10n.signupFirebaseTokenMissing)),
       );
       return;
     }
@@ -277,6 +274,9 @@ class _SignupPageState extends State<SignupPage> {
             icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary, size: 20),
             onPressed: () => Navigator.of(context).pop(),
           ),
+          actions: [
+            AuthLanguageDropdown(),
+          ],
         ),
         body: SafeArea(
           child: SingleChildScrollView(
@@ -286,6 +286,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
             child: BlocBuilder<AuthBloc, AuthState>(
               builder: (context, state) {
+                final l10n = AppLocalizations.of(context)!;
                 final isLoading = state is AuthLoading;
                 final busy = isLoading || _sendingOtp || _verifyingOtp;
                 return Column(
@@ -294,13 +295,13 @@ class _SignupPageState extends State<SignupPage> {
                     const _LogoSection(),
                     const SizedBox(height: Spacing.lg),
                     Text(
-                      'Create Account',
+                      l10n.signupTitle,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.headlineMedium.copyWith(color: AppColors.textPrimary),
                     ),
                     const SizedBox(height: Spacing.xs),
                     Text(
-                      'Sign up to get started with CarCare',
+                      l10n.signupSubtitle,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
                     ),
@@ -327,12 +328,12 @@ class _SignupPageState extends State<SignupPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('First Name', style: AppTextStyles.labelMedium),
+                                    Text(l10n.signupFirstName, style: AppTextStyles.labelMedium),
                                     const SizedBox(height: Spacing.xs),
                                     TextField(
                                       controller: _firstNameController,
                                       enabled: !isLoading,
-                                      decoration: const InputDecoration(hintText: 'John'),
+                                      decoration: InputDecoration(hintText: l10n.signupHintFirstName),
                                     ),
                                   ],
                                 ),
@@ -342,12 +343,12 @@ class _SignupPageState extends State<SignupPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Last Name', style: AppTextStyles.labelMedium),
+                                    Text(l10n.signupLastName, style: AppTextStyles.labelMedium),
                                     const SizedBox(height: Spacing.xs),
                                     TextField(
                                       controller: _lastNameController,
                                       enabled: !isLoading,
-                                      decoration: const InputDecoration(hintText: 'Doe'),
+                                      decoration: InputDecoration(hintText: l10n.signupHintLastName),
                                     ),
                                   ],
                                 ),
@@ -355,28 +356,28 @@ class _SignupPageState extends State<SignupPage> {
                             ],
                           ),
                           const SizedBox(height: Spacing.lg),
-                          Text('Email', style: AppTextStyles.labelMedium),
+                          Text(l10n.signupEmail, style: AppTextStyles.labelMedium),
                           const SizedBox(height: Spacing.xs),
                           TextField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
                             enabled: !isLoading,
-                            decoration: const InputDecoration(
-                              hintText: 'you@example.com',
-                              prefixIcon: Icon(Icons.email_outlined, color: AppColors.textSecondary),
+                            decoration: InputDecoration(
+                              hintText: l10n.signupEmailHint,
+                              prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textSecondary),
                             ),
                           ),
                           const SizedBox(height: Spacing.lg),
-                          Text('Phone Number', style: AppTextStyles.labelMedium),
+                          Text(l10n.signupPhoneLabel, style: AppTextStyles.labelMedium),
                           const SizedBox(height: Spacing.xs),
                           TextField(
                             controller: _phoneController,
                             keyboardType: TextInputType.phone,
                                       enabled: !busy,
                             inputFormatters: const [EthiopiaPhoneInputFormatter()],
-                            decoration: const InputDecoration(
-                              hintText: '09…, 251…, or +251…',
-                              prefixIcon: Icon(Icons.phone_outlined, color: AppColors.textSecondary),
+                            decoration: InputDecoration(
+                              hintText: l10n.signupPhoneHint,
+                              prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.textSecondary),
                             ),
                           ),
                                     const SizedBox(height: Spacing.sm),
@@ -392,7 +393,7 @@ class _SignupPageState extends State<SignupPage> {
                                                     child: CircularProgressIndicator(strokeWidth: 2),
                                                   )
                                                 : const Icon(Icons.sms_outlined),
-                                            label: Text(_otpSent ? 'Resend OTP' : 'Send OTP'),
+                                            label: Text(_otpSent ? l10n.signupResendOtp : l10n.signupSendOtp),
                                           ),
                                         ),
                                         const SizedBox(width: Spacing.sm),
@@ -405,7 +406,7 @@ class _SignupPageState extends State<SignupPage> {
                                     ),
                                     if (_otpSent) ...[
                                       const SizedBox(height: Spacing.md),
-                                      Text('OTP Code', style: AppTextStyles.labelMedium),
+                                      Text(l10n.signupOtpCodeLabel, style: AppTextStyles.labelMedium),
                                       const SizedBox(height: Spacing.xs),
                                       Row(
                                         children: [
@@ -414,8 +415,8 @@ class _SignupPageState extends State<SignupPage> {
                                               controller: _otpController,
                                               keyboardType: TextInputType.number,
                                               enabled: !busy && !_otpVerified,
-                                              decoration: const InputDecoration(
-                                                hintText: 'Enter 6-digit code',
+                                              decoration: InputDecoration(
+                                                hintText: l10n.signupOtpHint,
                                                 prefixIcon: Icon(
                                                   Icons.password_outlined,
                                                   color: AppColors.textSecondary,
@@ -434,21 +435,21 @@ class _SignupPageState extends State<SignupPage> {
                                                       height: 16,
                                                       child: CircularProgressIndicator(strokeWidth: 2),
                                                     )
-                                                  : Text(_otpVerified ? 'Verified' : 'Verify'),
+                                                  : Text(_otpVerified ? l10n.signupVerified : l10n.signupVerify),
                                             ),
                                           ),
                                         ],
                                       ),
                                     ],
                           const SizedBox(height: Spacing.lg),
-                          Text('Password', style: AppTextStyles.labelMedium),
+                          Text(l10n.signupPasswordLabel, style: AppTextStyles.labelMedium),
                           const SizedBox(height: Spacing.xs),
                           TextField(
                             controller: _passwordController,
                             obscureText: _obscurePassword,
                             enabled: !isLoading,
                             decoration: InputDecoration(
-                              hintText: 'At least 8 characters',
+                              hintText: l10n.signupPasswordHint,
                               prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -460,14 +461,14 @@ class _SignupPageState extends State<SignupPage> {
                             ),
                           ),
                           const SizedBox(height: Spacing.lg),
-                          Text('Confirm Password', style: AppTextStyles.labelMedium),
+                          Text(l10n.signupConfirmPasswordLabel, style: AppTextStyles.labelMedium),
                           const SizedBox(height: Spacing.xs),
                           TextField(
                             controller: _confirmPasswordController,
                             obscureText: _obscureConfirm,
                             enabled: !isLoading,
                             decoration: InputDecoration(
-                              hintText: 'Re-enter your password',
+                              hintText: l10n.signupConfirmPasswordHint,
                               prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -500,7 +501,7 @@ class _SignupPageState extends State<SignupPage> {
                                         color: AppColors.secondary,
                                       ),
                                     )
-                                  : const Text('Create Account'),
+                                  : Text(l10n.signupCreateButton),
                             ),
                           ),
                         ],

@@ -3,6 +3,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -61,7 +62,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     const pageBg = Color(0xFFF6F7FB);
     return Scaffold(
       backgroundColor: pageBg,
-      appBar: const NavAppBar(title: 'CarCare', notificationCount: null),
+      appBar: NavAppBar.mainShell(context, showStaticNotificationBadge: false),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -88,14 +89,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Notifications',
+                          AppLocalizations.of(context)!.notifTitle,
                           style: AppTextStyles.titleLarge.copyWith(
                             color: AppColors.textPrimary,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         Text(
-                          'Maintenance reminders and app updates',
+                          AppLocalizations.of(context)!.notifSubtitle,
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textSecondary,
                           ),
@@ -114,7 +115,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                 );
                               }
                             : null,
-                        child: const Text('Mark all as read'),
+                        child: Text(AppLocalizations.of(context)!.notifMarkAllRead),
                       );
                     },
                   ),

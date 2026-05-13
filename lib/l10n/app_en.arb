@@ -1,0 +1,564 @@
+{
+  "@@locale": "en",
+  "appTitle": "Driver Assistance",
+  "loginPhoneInvalidSnackbar": "Enter a valid phone: 09…, 251…, or +251… (9-digit mobile).",
+  "loginWelcomeTitle": "Welcome Back",
+  "loginWelcomeSubtitle": "Sign in to continue to your account",
+  "loginPhoneLabel": "Phone Number",
+  "loginPhoneHint": "09…, 251…, or +251…",
+  "loginPasswordLabel": "Password",
+  "loginPasswordHint": "Enter your password",
+  "loginButton": "Log in",
+  "loginNoAccountPrompt": "Don't have an account? ",
+  "loginCreateAccount": "Create account",
+  "signupEnterValidPhoneOtp": "Enter a valid phone before requesting OTP.",
+  "signupPhoneVerifiedAutomatic": "Phone number verified automatically.",
+  "signupFailedSendOtp": "Failed to send OTP.",
+  "signupOtpSentCheckSms": "OTP sent. Check your SMS.",
+  "signupOtpSetupFailed": "OTP setup failed: {error}",
+  "@signupOtpSetupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "signupRequestOtpFirst": "Request OTP first.",
+  "signupEnterValidPhone": "Enter a valid phone number.",
+  "signupEnterSixDigitOtp": "Enter the 6-digit OTP code.",
+  "signupPasswordsMismatch": "Passwords do not match",
+  "signupPasswordMin8": "Password must be at least 8 characters",
+  "signupPhoneInvalidSnackbar": "Enter a valid phone: 09…, 251…, or +251… (9-digit mobile).",
+  "signupVerifyPhoneBeforeSignup": "Verify your phone with OTP before signup.",
+  "signupFirebaseTokenMissing": "Phone verified, but Firebase token is missing. Verify OTP again.",
+  "signupTitle": "Create Account",
+  "signupSubtitle": "Sign up to get started with CarCare",
+  "signupFirstName": "First Name",
+  "signupLastName": "Last Name",
+  "signupHintFirstName": "John",
+  "signupHintLastName": "Doe",
+  "signupEmail": "Email",
+  "signupEmailHint": "you@example.com",
+  "signupPhoneLabel": "Phone Number",
+  "signupPhoneHint": "09…, 251…, or +251…",
+  "signupSendOtp": "Send OTP",
+  "signupResendOtp": "Resend OTP",
+  "signupOtpCodeLabel": "OTP Code",
+  "signupOtpHint": "Enter 6-digit code",
+  "signupVerify": "Verify",
+  "signupVerified": "Verified",
+  "signupPasswordLabel": "Password",
+  "signupPasswordHint": "At least 8 characters",
+  "signupConfirmPasswordLabel": "Confirm Password",
+  "signupConfirmPasswordHint": "Re-enter your password",
+  "signupCreateButton": "Create Account",
+  "signupOtpVerifiedSuccess": "OTP verified successfully.",
+  "signupInvalidOtp": "Invalid OTP code.",
+  "settingsTitle": "Settings",
+  "settingsLanguageSection": "Language",
+  "settingsLanguageEnglish": "English",
+  "settingsLanguageAmharic": "አማርኛ (Amharic)",
+  "settingsChangePasswordTitle": "Change Password",
+  "settingsChangePasswordSubtitle": "Use your current password to set a new one.",
+  "settingsCurrentPasswordLabel": "Current password",
+  "settingsNewPasswordLabel": "New password",
+  "settingsConfirmNewPasswordLabel": "Confirm new password",
+  "settingsPasswordChanged": "Password changed successfully",
+  "settingsRequestFailed": "Request failed",
+  "settingsUnableChangePassword": "Unable to change password right now.",
+  "settingsValidatorCurrentRequired": "Current password is required",
+  "settingsValidatorNewRequired": "New password is required",
+  "settingsValidatorNewMin6": "Password must be at least 6 characters",
+  "settingsValidatorNewDifferent": "New password must be different",
+  "settingsValidatorConfirmRequired": "Please confirm your new password",
+  "settingsValidatorPasswordsMismatch": "Passwords do not match",
+  "settingsUpdatePasswordButton": "Update password",
+  "brandCarCare": "CarCare",
+  "commonRetry": "Retry",
+  "commonCancel": "Cancel",
+  "commonYes": "Yes",
+  "commonNo": "No",
+  "commonContinue": "Continue",
+  "commonBack": "Back",
+  "commonSubmit": "Submit",
+  "commonDelete": "Delete",
+  "commonEdit": "Edit",
+  "commonReport": "Report",
+  "commonSave": "Save",
+  "commonAdd": "Add",
+  "commonClear": "Clear",
+  "commonViewAll": "View All",
+  "commonRemove": "Remove",
+  "commonBook": "Book",
+  "commonCall": "Call",
+  "commonRoute": "Route",
+  "commonNavigate": "Navigate",
+  "commonGuest": "Guest",
+  "commonEmDash": "—",
+  "drawerNavSection": "NAVIGATION",
+  "drawerAccountSection": "ACCOUNT",
+  "drawerHome": "Home",
+  "drawerMyVehicles": "My Vehicles",
+  "drawerService": "Service",
+  "drawerCommunity": "Community",
+  "drawerEducation": "Education",
+  "drawerProfile": "Profile",
+  "drawerSettings": "Settings",
+  "drawerHelpSupport": "Help & Support",
+  "drawerLogout": "Logout",
+  "onbTitle1": "Know Your Car's Health",
+  "onbBody1": "Track your vehicle details, maintenance status, and upcoming services all in one place — no more guesswork.",
+  "onbTitle2": "Never Miss Maintenance",
+  "onbBody2": "Get timely reminders for oil changes, tire checks, and services so your car stays reliable and safe.",
+  "onbTitle3": "Find Help When You Need It",
+  "onbBody3": "Locate nearby garages, book services, or request onsite assistance anytime, anywhere.",
+  "onbTitle4": "Ask Your AI Car Assistant",
+  "onbBody4": "Chat with an AI assistant for instant help, maintenance tips, and answers about your vehicle.",
+  "onbTitle5": "Learn. Share. Drive Better.",
+  "onbBody5": "Explore car care guides and connect with other drivers to share experiences and advice.",
+  "onbTitle6": "Ready to Drive Smarter?",
+  "onbBody6": "Join thousands of drivers who trust us to keep their vehicles in perfect condition.",
+  "onbSkip": "Skip",
+  "onbGetStarted": "Get Started",
+  "profileTitle": "Profile",
+  "profileUpdated": "Profile updated",
+  "profileFirstName": "First Name",
+  "profileLastName": "Last Name",
+  "profileEmail": "Email",
+  "profilePleaseSignIn": "Please sign in.",
+  "commCreatePost": "Create Post",
+  "commReportPost": "Report Post",
+  "commReportSpam": "Spam",
+  "commReportHarassment": "Harassment",
+  "commReportHate": "Hate speech",
+  "commReportFalseInfo": "False information",
+  "commReportViolence": "Violence",
+  "commReportNudity": "Nudity or sexual content",
+  "commReportScam": "Scam or fraud",
+  "commReportOther": "Other",
+  "eduClear": "Clear",
+  "eduViewAll": "View All",
+  "eduRetry": "Retry",
+  "eduGetManual": "Get Manual",
+  "eduInvalidPdf": "Invalid PDF link.",
+  "eduCouldNotOpenManual": "Could not open this manual.",
+  "notifMarkAllRead": "Mark all as read",
+  "vehScheduleMaintenance": "Schedule Maintenance",
+  "maintSetReminder": "Set Maintenance Reminder",
+  "maintDone": "Done",
+  "maintDelete": "Delete",
+  "logMaintNoVehicle": "No vehicle",
+  "bookWizardGarageError": "Unable to load garage availability",
+  "bookWizardAddVehicle": "Add Vehicle",
+  "bookWizardSlotUnavailable": "Selected time is not available. Please choose an available slot.",
+  "bookWizardBackHome": "Back to Home",
+  "bookWizardViewAppointments": "View All Appointments",
+  "svcApptUpdated": "Appointment updated.",
+  "svcRetry": "Retry",
+  "svcRateGarage": "Rate Garage",
+  "svcReschedule": "Reschedule",
+  "svcCancel": "Cancel",
+  "svcRateExperienceTitle": "How was your service experience?",
+  "svcRatingThanks": "Thanks! Your rating was submitted.",
+  "svcCancelApptTitle": "Cancel appointment?",
+  "svcCancelApptBody": "This action cannot be undone.",
+  "svcBook": "Book",
+  "svcCall": "Call",
+  "svcRoute": "Route",
+  "svcNoPhone": "No phone number available for this garage.",
+  "svcCallNotSupported": "Calling is not supported on this device.",
+  "apptCancelTitle": "Cancel appointment?",
+  "apptCancelBody": "This action cannot be undone.",
+  "mapLocationRequired": "Location required to load nearby places",
+  "mapRoutingLocationRequired": "Current location is required for routing",
+  "mapRouteUpdated": "Route updated to tapped location",
+  "mapSetAsStart": "Set as start",
+  "mapApptBooked": "Appointment booked successfully",
+  "mapGettingLocation": "Getting your location...",
+  "mapBookAppointment": "Book Appointment",
+  "mapRequestOnsite": "Request On-site Service",
+  "vehDetailRemoved": "Vehicle removed.",
+  "vehDetailAskAi": "Ask AI assistant",
+  "vehDetailEditVehicle": "Edit Vehicle",
+  "vehDetailRemoveVehicle": "Remove Vehicle",
+  "vehDetailRemoveTitle": "Remove vehicle?",
+  "vehDetailInsurance": "Insurance",
+  "vehDetailRegistration": "Registration",
+  "vehDetailViewDocuments": "View Documents",
+  "vehDetailInsuranceDoc": "Insurance Document",
+  "vehDetailRegistrationDoc": "Registration Document",
+  "vehDetailTitle": "Vehicle Details",
+  "vehDetailRemoveConfirmBody": "{name} will be removed. This action cannot be undone.",
+  "vehDetailHealthUnavailable": "Overall health unavailable",
+  "vehDetailHealthRetryHint": "Pull to refresh or try again.",
+  "vehDetailDocumentsSection": "Documents",
+  "vehDetailVehicleInformation": "Vehicle Information",
+  "vehDetailMakeModel": "Make & Model",
+  "vehDetailYear": "Year",
+  "vehDetailVin": "VIN",
+  "vehDetailMileage": "Mileage",
+  "vehDetailFuelType": "Fuel Type",
+  "vehDetailInsuranceActiveExpires": "Active - Expires {date}",
+  "vehDetailRegistrationValidExpires": "Valid - Expires {date}",
+  "vehDetailNoDocumentsAvailable": "No documents available.",
+  "commonMilesUnit": "miles",
+  "addVehSuccessAdded": "Vehicle added successfully.",
+  "addVehSuccessUpdated": "Vehicle updated.",
+  "addVehFileSelected": "Selected: {name}",
+  "addVehFilePickerError": "Could not open file picker: {error}",
+  "addVehFillRequired": "Please fill Make, Model and License Plate.",
+  "addVehSaveChanges": "Save Changes",
+  "addVehSelectFile": "Select file",
+  "addVehVehicleSummary": "Vehicle Summary",
+  "addVehAddVehicle": "Add Vehicle",
+  "addVehEditDetails": "Edit Details",
+  "addVehReadyConfirmBanner": "Ready to add this vehicle in your garage. You can edit details anytime.",
+  "postImagesTooLarge": "Selected images were too large.",
+  "postImagesExceedServer": "Selected images exceed server size limit.",
+  "postImagesSomeSkipped": "Some images were skipped to fit server upload size.",
+  "postImagesRemoveSome": "Images are too large. Remove some images and try again.",
+  "postAddPhotos": "Add photos",
+  "aiAssistantTitle": "AI Assistant",
+  "aiChatHistoryTitle": "Chat History",
+  "aiStartNewChat": "Start New Chat",
+  "aiDeleteSessionTitle": "Delete chat session?",
+  "aiDeleteSessionBody": "This will remove the conversation from history. This action cannot be undone.",
+  "timeJustNow": "Just now",
+  "timeMinAgo": "{count} min ago",
+  "timeHrAgo": "{count} hr ago",
+  "timeDaysAgo": "{count} days ago",
+  "routerPageNotFound": "Error: Page not found",
+  "mapRouteNumbered": "Route {routeNumber}",
+  "scheduleMaintRetry": "Retry",
+  "scheduleMaintAdd": "Add",
+  "@addVehFileSelected": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@addVehFilePickerError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@timeMinAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@timeHrAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@mapRouteNumbered": {
+    "placeholders": {
+      "routeNumber": {
+        "type": "int"
+      }
+    }
+  },
+  "profileSubtitle": "Update your name and email. Changes appear in the drawer.",
+  "profileHintFirstName": "First name",
+  "profileHintLastName": "Last name",
+  "profileHintEmail": "Email",
+  "profileSaveChanges": "Save changes",
+  "commNoPostsFound": "No posts found.",
+  "commReportDetailsHint": "Tell us what is wrong",
+  "commCommunityTitle": "Community",
+  "commCommunitySubtitle": "Connect with car owners",
+  "timeWeeksAgo": "{count} weeks ago",
+  "commComments": "Comments",
+  "commNoComments": "No comments yet.",
+  "commWriteComment": "Write a comment",
+  "commActionsTooltip": "Actions",
+  "@timeWeeksAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commShowMore": "Show more",
+  "commShowLess": "Show less",
+  "commSearchHint": "Search posts...",
+  "commInvalidImage": "Invalid image",
+  "commCannotLoadImage": "Cannot load image",
+  "commInvalidImageUrl": "Invalid image URL",
+  "tabAll": "All",
+  "tabMyPosts": "My posts",
+  "tabBookmarks": "Bookmarks",
+  "navHome": "Home",
+  "navVehicle": "Vehicle",
+  "navService": "Service",
+  "navCommunity": "Community",
+  "navEducation": "Education",
+  "notifTitle": "Notifications",
+  "notifSubtitle": "Maintenance reminders and app updates",
+  "commonGarage": "Garage",
+  "apptGarageLine": "Garage: {name}",
+  "apptCarLine": "Car: {name}",
+  "apptServiceDefault": "Service",
+  "@apptGarageLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@apptCarLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "navVehicles": "Vehicles",
+  "navEduShort": "Edu",
+  "dashNoVehicle": "No vehicle",
+  "dashAddVehiclePlateHint": "Add a vehicle",
+  "dashSelectVehicleForHealth": "Add or select a vehicle to load car health from the server.",
+  "dashCouldNotLoadVehicleHealth": "Could not load vehicle health.",
+  "dashVehicleHealthTitle": "Vehicle Health",
+  "dashOverallCarHealthTitle": "Overall car health",
+  "dashHealthScoresFallback": "Scores come from your maintenance activity and garage data for this vehicle.",
+  "dashNoSubsystemData": "No subsystem data yet.",
+  "dashMaintenanceRemindersTitle": "Maintenance Reminders",
+  "dashViewAll": "View all",
+  "dashNoRemindersYet": "No reminders yet. Schedule maintenance to get started.",
+  "dashOverdueByDays": "Overdue by {days} days",
+  "dashDueToday": "Due today",
+  "dashDueTomorrow": "Due tomorrow",
+  "dashDueInDays": "Due in {days} days",
+  "dashDueInWeeks": "Due in {weeks} weeks",
+  "dashStatusUrgent": "Urgent",
+  "dashStatusSoon": "Soon",
+  "dashStatusGood": "Good",
+  "dashStatusDone": "Done",
+  "dashPlateLine": "Plate {plate}",
+  "dashQuickActionsTitle": "Quick Actions",
+  "dashBookService": "Book Service",
+  "dashFindNearbyGarage": "Find Nearby Garage",
+  "dashChatAiAssistant": "Chat with AI Assistant",
+  "dashMaintenanceHistory": "Maintenance History",
+  "dashRecentActivityTitle": "Recent Activity",
+  "dashNoRecentActivity": "No recent activity yet.",
+  "dashActivityCompleted": "{title} completed",
+  "dashVehicleAdded": "Vehicle added: {name}",
+  "timeMonthsAgo": "{count} months ago",
+  "vehListTitleMyVehicles": "My Vehicles",
+  "vehListTitleUpcoming": "Upcoming Maintenance",
+  "vehListTitleHistory": "Maintenance History",
+  "vehListSubtitleMyVehicles": "Manage your vehicles and maintenance",
+  "vehListSubtitleUpcoming": "Scheduled and recommended services",
+  "vehListSubtitleHistory": "Scheduled reminders and completed services",
+  "vehSegmentMyVehicles": "My Vehicles",
+  "vehSegmentUpcoming": "Upcoming",
+  "vehSegmentHistory": "History",
+  "vehRetry": "Retry",
+  "vehFabAddNewVehicle": "Add New Vehicle",
+  "vehFabRegisterAnother": "Register another car",
+  "vehHistoryEmpty": "Nothing here yet.\n\nScheduled reminders and completed services show here with status (Good, Soon, Overdue, Done). Use Upcoming to schedule maintenance or mark it done.",
+  "vehCardStatusGood": "Good",
+  "vehCardStatusAttention": "Attention",
+  "eduAllArticlesTitle": "All articles",
+  "eduArticlesInCategory": "{category} articles",
+  "eduNoArticlesInCategory": "No articles in this category.",
+  "eduArticleLabel": "Article",
+  "eduCategoryGuide": "{category} guide",
+  "eduCouldNotLoadArticle": "Could not load this article.",
+  "eduReadMinutes": "{minutes} min",
+  "eduCenterTitle": "Education Center",
+  "eduCenterSubtitle": "Learn to maintain your vehicle",
+  "eduSearchHint": "Search guides and articles...",
+  "eduResultsFor": "Results for \"{query}\"",
+  "eduFeaturedArticles": "Featured Articles",
+  "eduNoArticlesMatchSearch": "No articles match your search.",
+  "eduNoArticlesYet": "No articles yet. Check back soon.",
+  "eduCategoryArticleCount": "{count} articles",
+  "eduCatRepairs": "Repair",
+  "eduCatSafety": "Safety",
+  "eduCatMaintenance": "Maintenance",
+  "eduCatTips": "Tips",
+  "eduCatManuals": "Manuals",
+  "eduReadMore": "Read ›",
+  "eduDifficultyBeginner": "Beginner",
+  "eduDifficultyIntermediate": "Intermediate",
+  "eduTopicSafety": "Safety tips",
+  "eduTopicMaintenance": "Maintenance basics",
+  "eduTopicRepairs": "Repair guides",
+  "eduTopicTips": "Tips & tricks",
+  "eduTopicAll": "Guide",
+  "eduTopicManuals": "Manual",
+  "svcLocServicesDisabled": "Location services are disabled. Enable location to see nearby garages.",
+  "svcLocPermissionDeniedForever": "Location permission is permanently denied. Allow it from app settings.",
+  "svcLocPermissionDenied": "Location permission denied. Allow location permission to find nearby garages.",
+  "svcLocFetchFailed": "Unable to fetch your location. Showing fallback results.",
+  "svcServiceCentersTitle": "Service Centers",
+  "svcServiceCentersSubtitle": "Find nearby garages and book service",
+  "svcUpcomingAppointments": "Upcoming Appointments",
+  "svcNoUpcomingAppointments": "No upcoming appointments",
+  "svcNearbyCentersTitle": "Nearby Service Centers",
+  "svcNoNearbyGarages": "No nearby garages found.",
+  "svcOpen": "Open",
+  "svcClosed": "Closed",
+  "svcViewReviews": "View reviews",
+  "svcReviewsRatingTitle": "Reviews & Rating",
+  "svcReviewCount": "{count, plural, =1{1 review} other{{count} reviews}}",
+  "svcReviewsLoadError": "Could not load reviews right now.",
+  "svcReviewsEmpty": "No reviews yet for this garage.",
+  "svcReviewNoComment": "No comment",
+  "svcReviewAnonymousDriver": "Driver",
+  "svcUnknownDate": "Unknown date",
+  "svcMapView": "Map View",
+  "svcApptsPageTitle": "Appointments",
+  "svcApptsListTitle": "Appointments",
+  "svcApptsListSubtitle": "View and manage your bookings",
+  "svcNoAppointmentsFound": "No appointments found",
+  "svcNoAppointmentsYet": "No appointments yet",
+  "svcUnableSubmitRating": "Unable to submit rating",
+  "svcUnableLoadGarages": "Unable to load nearby garages.",
+  "svcRateTapStar": "Tap a star to rate",
+  "svcRateStarsSelected": "{count, plural, =1{1 star selected} other{{count} stars selected}}",
+  "svcRateFeedbackHint": "Write optional feedback",
+  "apptStatusPending": "Pending",
+  "apptStatusConfirmed": "Confirmed",
+  "apptStatusRejected": "Rejected",
+  "apptStatusInService": "In Service",
+  "apptStatusCompleted": "Completed",
+  "apptStatusCancelled": "Cancelled",
+  "@dashOverdueByDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashDueInDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashDueInWeeks": {
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashPlateLine": {
+    "placeholders": {
+      "plate": {
+        "type": "String"
+      }
+    }
+  },
+  "@dashActivityCompleted": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@dashVehicleAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@timeMonthsAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@eduArticlesInCategory": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "@eduCategoryGuide": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "@vehDetailRemoveConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@vehDetailInsuranceActiveExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@vehDetailRegistrationValidExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@eduReadMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@eduResultsFor": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "@eduCategoryArticleCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@svcReviewCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@svcRateStarsSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

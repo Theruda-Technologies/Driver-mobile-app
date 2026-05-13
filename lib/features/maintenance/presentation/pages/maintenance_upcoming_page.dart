@@ -3,6 +3,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -44,7 +45,7 @@ class _MaintenanceUpcomingPageState extends State<MaintenanceUpcomingPage> {
   Widget _buildScaffold(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const NavAppBar(title: 'CarCare', notificationCount: 3),
+      appBar: NavAppBar.mainShell(context),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(Spacing.lg, Spacing.sm, Spacing.lg, Spacing.lg),
@@ -82,11 +83,24 @@ class _MaintenanceUpcomingPageState extends State<MaintenanceUpcomingPage> {
               Expanded(
                 child: BlocBuilder<MaintenanceBloc, MaintenanceState>(
                   builder: (context, state) {
-                    final items = state.upcoming.where((u) => u.isActiveReminder).toList();
-                    if (state.loading && items.isEmpty) {
+                    final now = DateTime.now();
+                    final today = DateTime(now.year, now.month, now.day);
+                    final active = state.upcoming.where((u) => u.isActiveReminder).toList();
+                    active.sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+                    final overdue = <dynamic>[];
+                    final upcoming = <dynamic>[];
+                    for (final u in active) {
+                      final d = DateTime(u.scheduledAt.year, u.scheduledAt.month, u.scheduledAt.day);
+                      if (d.isBefore(today)) {
+                        overdue.add(u);
+                      } else {
+                        upcoming.add(u);
+                      }
+                    }
+                    if (state.loading && active.isEmpty) {
                       return const Center(child: CircularProgressIndicator());
                     }
-                    if (items.isEmpty) {
+                    if (active.isEmpty) {
                       return Center(
                         child: Text(
                           'No upcoming maintenance.',
@@ -94,24 +108,79 @@ class _MaintenanceUpcomingPageState extends State<MaintenanceUpcomingPage> {
                         ),
                       );
                     }
-                    return ListView.separated(
-                      itemCount: items.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: Spacing.md),
-                      itemBuilder: (context, i) {
-                        final m = items[i];
-                        return MaintenanceUpcomingListItem(
-                          item: m,
-                          onDelete: () {
-                            context.read<MaintenanceBloc>().add(MaintenanceUpcomingDeleteRequested(m.id));
-                          },
-                          onToggleReminder: () {
-                            context.read<MaintenanceBloc>().add(MaintenanceToggleReminderRequested(m.id));
-                          },
-                          onMarkDone: m.canMarkDoneFromUi
-                              ? () => context.read<MaintenanceBloc>().add(MaintenanceMarkDoneRequested(m.id))
-                              : null,
+                    final rows = <Widget>[];
+                    if (overdue.isNotEmpty) {
+                      rows.add(
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: Spacing.sm),
+                          child: Text(
+                            'Past due',
+                            style: AppTextStyles.titleSmall.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      );
+                      for (final u in overdue.cast()) {
+                        rows.add(
+                          MaintenanceUpcomingListItem(
+                            item: u,
+                            onDelete: () => context.read<MaintenanceBloc>().add(
+                                  MaintenanceUpcomingDeleteRequested(u.id),
+                                ),
+                            onToggleReminder: () => context.read<MaintenanceBloc>().add(
+                                  MaintenanceToggleReminderRequested(u.id),
+                                ),
+                            onMarkDone: u.canMarkDoneFromUi
+                                ? () => context.read<MaintenanceBloc>().add(
+                                      MaintenanceMarkDoneRequested(u.id),
+                                    )
+                                : null,
+                          ),
                         );
-                      },
+                        rows.add(const SizedBox(height: Spacing.md));
+                      }
+                    }
+                    if (upcoming.isNotEmpty) {
+                      if (rows.isNotEmpty) rows.add(const SizedBox(height: Spacing.xs));
+                      rows.add(
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: Spacing.sm),
+                          child: Text(
+                            'Upcoming',
+                            style: AppTextStyles.titleSmall.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      );
+                      for (final u in upcoming.cast()) {
+                        rows.add(
+                          MaintenanceUpcomingListItem(
+                            item: u,
+                            onDelete: () => context.read<MaintenanceBloc>().add(
+                                  MaintenanceUpcomingDeleteRequested(u.id),
+                                ),
+                            onToggleReminder: () => context.read<MaintenanceBloc>().add(
+                                  MaintenanceToggleReminderRequested(u.id),
+                                ),
+                            onMarkDone: u.canMarkDoneFromUi
+                                ? () => context.read<MaintenanceBloc>().add(
+                                      MaintenanceMarkDoneRequested(u.id),
+                                    )
+                                : null,
+                          ),
+                        );
+                        rows.add(const SizedBox(height: Spacing.md));
+                      }
+                    }
+                    if (rows.isNotEmpty && rows.last is SizedBox) {
+                      rows.removeLast();
+                    }
+                    return ListView(
+                      children: rows,
                     );
                   },
                 ),
@@ -136,7 +205,7 @@ class _MaintenanceUpcomingPageState extends State<MaintenanceUpcomingPage> {
                     );
                   },
                   icon: const Icon(Icons.calendar_today_outlined),
-                  label: const Text('Set Maintenance Reminder'),
+                  label: Text(AppLocalizations.of(context)!.maintSetReminder),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.textPrimary,
                     foregroundColor: Colors.white,

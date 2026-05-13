@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
+import '../../../../core/widgets/auth_language_dropdown.dart';
 import '../../../../core/utils/ethiopia_phone.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -31,14 +33,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _submit() {
+    final l10n = AppLocalizations.of(context)!;
     final normalized = normalizeEthiopiaPhone(_phoneController.text);
     if (normalized == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Enter a valid phone: 09…, 251…, or +251… (9-digit mobile).',
-          ),
-        ),
+        SnackBar(content: Text(l10n.loginPhoneInvalidSnackbar)),
       );
       return;
     }
@@ -71,15 +70,23 @@ class _LoginPageState extends State<LoginPage> {
             ),
             child: BlocBuilder<AuthBloc, AuthState>(
               builder: (context, state) {
+                final l10n = AppLocalizations.of(context)!;
                 final isLoading = state is AuthLoading;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Row(
+                      children: [
+                        const Spacer(),
+                        AuthLanguageDropdown(),
+                      ],
+                    ),
+                    const SizedBox(height: Spacing.md),
                     const SizedBox(height: Spacing.xxl),
                     const _LogoSection(),
                     const SizedBox(height: Spacing.xl),
                     Text(
-                      'Welcome Back',
+                      l10n.loginWelcomeTitle,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.headlineMedium.copyWith(
                         color: AppColors.textPrimary,
@@ -87,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: Spacing.xs),
                     Text(
-                      'Sign in to continue to your account',
+                      l10n.loginWelcomeSubtitle,
                       textAlign: TextAlign.center,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textSecondary,
@@ -110,27 +117,27 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text('Phone Number', style: AppTextStyles.labelMedium),
+                          Text(l10n.loginPhoneLabel, style: AppTextStyles.labelMedium),
                           const SizedBox(height: Spacing.xs),
                           TextFormField(
                             controller: _phoneController,
                             keyboardType: TextInputType.phone,
                             enabled: !isLoading,
                             inputFormatters: const [EthiopiaPhoneInputFormatter()],
-                            decoration: const InputDecoration(
-                              hintText: '09…, 251…, or +251…',
-                              prefixIcon: Icon(Icons.phone_outlined, color: AppColors.textSecondary),
+                            decoration: InputDecoration(
+                              hintText: l10n.loginPhoneHint,
+                              prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.textSecondary),
                             ),
                           ),
                           const SizedBox(height: Spacing.lg),
-                          Text('Password', style: AppTextStyles.labelMedium),
+                          Text(l10n.loginPasswordLabel, style: AppTextStyles.labelMedium),
                           const SizedBox(height: Spacing.xs),
                           TextFormField(
                             controller: _passwordController,
                             obscureText: _obscurePassword,
                             enabled: !isLoading,
                             decoration: InputDecoration(
-                              hintText: 'Enter your password',
+                              hintText: l10n.loginPasswordHint,
                               prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -166,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                                         color: AppColors.secondary,
                                       ),
                                     )
-                                  : const Text('Log in'),
+                                  : Text(l10n.loginButton),
                             ),
                           ),
                         ],
@@ -177,14 +184,14 @@ class _LoginPageState extends State<LoginPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Don\'t have an account? ',
+                          l10n.loginNoAccountPrompt,
                           style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
                         ),
                         GestureDetector(
                           onTap: () =>
                               Navigator.of(context).pushNamed('/signup'),
                           child: Text(
-                            'Create account',
+                            l10n.loginCreateAccount,
                             style: AppTextStyles.bodySmall.copyWith(
                               color: AppColors.primary,
                               fontWeight: FontWeight.w600,

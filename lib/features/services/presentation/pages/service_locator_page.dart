@@ -4,15 +4,17 @@ import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/constants/border_radius.dart';
-import '../../../../core/constants/dimensions.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_drawer.dart';
+import '../../../../core/widgets/driver_shell_bottom_nav_bar.dart';
 import '../../../../core/widgets/nav_app_bar.dart';
+import '../../../../core/widgets/simple_back_app_bar.dart';
 import '../../../../injection/service_locator.dart';
 import '../../../appointments/domain/entities/appointment.dart';
 import '../../../appointments/presentation/bloc/appointments_bloc.dart';
@@ -25,6 +27,15 @@ import '../bloc/service_locator_state.dart';
 import 'book_service_wizard_page.dart';
 import '../widgets/service_tag_chip.dart';
 import '../widgets/service_text_formatter.dart';
+
+enum _SvcLocIssue { servicesDisabled, permissionForever, permissionDenied, fetchFailed }
+
+String _localizedServiceLocatorFailure(BuildContext context, String raw) {
+  if (raw == ServiceLocatorBloc.kFailureUnableLoadNearby) {
+    return AppLocalizations.of(context)!.svcUnableLoadGarages;
+  }
+  return raw;
+}
 
 class ServiceLocatorPage extends StatelessWidget {
   const ServiceLocatorPage({super.key});
@@ -64,15 +75,14 @@ class _ServiceLocatorViewState extends State<_ServiceLocatorView> {
   Future<void> _loadNearbyWithLocation() async {
     double lat = _fallbackLat;
     double lng = _fallbackLng;
-    String? locationIssueMessage;
-    bool suggestOpenLocationSettings = false;
-    bool suggestOpenAppSettings = false;
+    _SvcLocIssue? locIssue;
+    var suggestOpenLocationSettings = false;
+    var suggestOpenAppSettings = false;
 
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        locationIssueMessage =
-            'Location services are disabled. Enable location to see nearby garages.';
+        locIssue = _SvcLocIssue.servicesDisabled;
         suggestOpenLocationSettings = true;
       } else {
         var permission = await Geolocator.checkPermission();
@@ -80,38 +90,41 @@ class _ServiceLocatorViewState extends State<_ServiceLocatorView> {
           permission = await Geolocator.requestPermission();
         }
         if (permission == LocationPermission.deniedForever) {
-          locationIssueMessage =
-              'Location permission is permanently denied. Allow it from app settings.';
+          locIssue = _SvcLocIssue.permissionForever;
           suggestOpenAppSettings = true;
         } else if (permission == LocationPermission.denied) {
-          locationIssueMessage =
-              'Location permission denied. Allow location permission to find nearby garages.';
+          locIssue = _SvcLocIssue.permissionDenied;
           suggestOpenAppSettings = true;
         }
       }
 
-      if (locationIssueMessage == null) {
+      if (locIssue == null) {
         final pos = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
         lat = pos.latitude;
         lng = pos.longitude;
       } else {
-        // Best-effort fallback: use last known position before static fallback.
         final lastKnown = await Geolocator.getLastKnownPosition();
         if (lastKnown != null) {
           lat = lastKnown.latitude;
           lng = lastKnown.longitude;
         }
       }
-    } catch (e) {
-      locationIssueMessage ??=
-          'Unable to fetch your location. Showing fallback results.';
+    } catch (_) {
+      locIssue ??= _SvcLocIssue.fetchFailed;
     }
 
-    if (locationIssueMessage != null && mounted) {
+    if (locIssue != null && mounted) {
+      final l10n = AppLocalizations.of(context)!;
+      final msg = switch (locIssue) {
+        _SvcLocIssue.servicesDisabled => l10n.svcLocServicesDisabled,
+        _SvcLocIssue.permissionForever => l10n.svcLocPermissionDeniedForever,
+        _SvcLocIssue.permissionDenied => l10n.svcLocPermissionDenied,
+        _SvcLocIssue.fetchFailed => l10n.svcLocFetchFailed,
+      };
       _showLocationIssue(
-        locationIssueMessage,
+        msg,
         suggestOpenLocationSettings: suggestOpenLocationSettings,
         suggestOpenAppSettings: suggestOpenAppSettings,
       );
@@ -129,6 +142,7 @@ class _ServiceLocatorViewState extends State<_ServiceLocatorView> {
     bool suggestOpenAppSettings = false,
   }) {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
@@ -138,7 +152,7 @@ class _ServiceLocatorViewState extends State<_ServiceLocatorView> {
         duration: const Duration(seconds: 6),
         action: (suggestOpenLocationSettings || suggestOpenAppSettings)
             ? SnackBarAction(
-                label: 'Settings',
+                label: l10n.settingsTitle,
                 textColor: AppColors.textPrimary,
                 onPressed: () async {
                   if (suggestOpenLocationSettings) {
@@ -160,19 +174,20 @@ class _ServiceLocatorViewState extends State<_ServiceLocatorView> {
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(currentRoute: '/services'),
-      appBar: const NavAppBar(title: 'CarCare', notificationCount: 3),
+      appBar: NavAppBar.mainShell(context),
       body: SafeArea(
         child: BlocConsumer<AppointmentsBloc, AppointmentsState>(
           listenWhen: (prev, curr) =>
               curr is AppointmentActionSuccess || curr is AppointmentsFailure,
           listener: (context, state) {
             if (state is AppointmentActionSuccess) {
+              final l10n = AppLocalizations.of(context)!;
               context.read<AppointmentsBloc>().add(
                 const AppointmentsLoadRequested(),
               );
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text('Appointment updated.'),
+                  content: Text(l10n.svcApptUpdated),
                   backgroundColor: AppColors.success,
                   behavior: SnackBarBehavior.floating,
                 ),
@@ -196,11 +211,12 @@ class _ServiceLocatorViewState extends State<_ServiceLocatorView> {
                   }
                   if (state.failureMessage != null && state.centers.isEmpty) {
                     return _ServiceErrorView(
-                      message: state.failureMessage!,
+                      message: _localizedServiceLocatorFailure(context, state.failureMessage!),
                       onRetry: _loadNearbyWithLocation,
                     );
                   }
 
+                  final l10n = AppLocalizations.of(context)!;
                   return SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
                       horizontal: Spacing.lg,
@@ -210,7 +226,7 @@ class _ServiceLocatorViewState extends State<_ServiceLocatorView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Service Centers',
+                          l10n.svcServiceCentersTitle,
                           style: AppTextStyles.headlineSmall.copyWith(
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
@@ -218,7 +234,7 @@ class _ServiceLocatorViewState extends State<_ServiceLocatorView> {
                         ),
                         const SizedBox(height: Spacing.xs),
                         Text(
-                          'Find nearby garages and book service',
+                          l10n.svcServiceCentersSubtitle,
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textSecondary,
                           ),
@@ -240,7 +256,7 @@ class _ServiceLocatorViewState extends State<_ServiceLocatorView> {
               ),
         ),
       ),
-      bottomNavigationBar: const _ServiceBottomNavBar(),
+      bottomNavigationBar: const DriverShellBottomNavBar(current: DriverShellTab.service),
     );
   }
 }
@@ -253,6 +269,7 @@ class _ServiceErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(Spacing.lg),
@@ -275,7 +292,7 @@ class _ServiceErrorView extends StatelessWidget {
                 backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.secondary,
               ),
-              child: const Text('Retry'),
+              child: Text(l10n.svcRetry),
             ),
           ],
         ),
@@ -324,6 +341,7 @@ class _UpcomingAppointmentsSection extends StatelessWidget {
 
         final top3 = upcoming.take(3).toList();
         final hasMore = upcoming.length > 3;
+        final l10n = AppLocalizations.of(context)!;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -331,7 +349,7 @@ class _UpcomingAppointmentsSection extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'Upcoming Appointments',
+                    l10n.svcUpcomingAppointments,
                     style: AppTextStyles.titleSmall.copyWith(
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -351,7 +369,7 @@ class _UpcomingAppointmentsSection extends StatelessWidget {
                     );
                   },
                   child: Text(
-                    'View All',
+                    l10n.commonViewAll,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: hasMore
                           ? AppColors.textSecondary
@@ -380,7 +398,7 @@ class _UpcomingAppointmentsSection extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    'No upcoming appointments',
+                    l10n.svcNoUpcomingAppointments,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -411,26 +429,17 @@ class AllUpcomingAppointmentsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (_) =>
           getIt<AppointmentsBloc>()..add(const AppointmentsLoadRequested()),
       child: Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(
+        appBar: SimpleBackTitleAppBar(
+          titleText: l10n.svcApptsPageTitle,
           backgroundColor: AppColors.surface,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new),
-            color: AppColors.textPrimary,
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Text(
-            'Appointments',
-            style: AppTextStyles.titleMedium.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
-          ),
+          leadingIcon: Icons.arrow_back_ios_new,
+          fontWeight: FontWeight.w600,
         ),
         body: SafeArea(
           child: BlocBuilder<AppointmentsBloc, AppointmentsState>(
@@ -451,7 +460,7 @@ class AllUpcomingAppointmentsPage extends StatelessWidget {
               if (allAppointments.isEmpty) {
                 return Center(
                   child: Text(
-                    'No appointments yet',
+                    l10n.svcNoAppointmentsYet,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -478,7 +487,7 @@ class AllUpcomingAppointmentsPage extends StatelessWidget {
             },
           ),
         ),
-        bottomNavigationBar: const _ServiceBottomNavBar(),
+        bottomNavigationBar: const DriverShellBottomNavBar(current: DriverShellTab.service),
       ),
     );
   }
@@ -497,19 +506,21 @@ class _AppointmentCardFromEntity extends StatelessWidget {
     try {
       return centers.firstWhere((c) => c.id == appointment.garageId).name;
     } catch (_) {
-      return 'Garage';
+      return '';
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final statusLabel = _statusLabel(appointment.status);
+    final l10n = AppLocalizations.of(context)!;
+    final statusLabel = _statusLabel(l10n, appointment.status);
     final statusColor = _statusColor(appointment.status);
     final dateStr = _formatDate(appointment.scheduledAt);
     final timeStr = _formatTime(appointment.scheduledAt);
 
-    final garageName = appointment.garageName ?? _garageName;
-    final carName = appointment.vehicleName ?? '—';
+    final resolvedGarage = _garageName.trim().isNotEmpty ? _garageName : l10n.commonGarage;
+    final garageName = appointment.garageName ?? resolvedGarage;
+    final carName = appointment.vehicleName ?? l10n.commonEmDash;
 
     return Container(
       padding: const EdgeInsets.all(Spacing.md),
@@ -534,7 +545,7 @@ class _AppointmentCardFromEntity extends StatelessWidget {
                 child: Text(
                   appointment.serviceSummary.isNotEmpty
                       ? formatServiceLine(appointment.serviceSummary)
-                      : 'Service',
+                      : l10n.apptServiceDefault,
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -564,14 +575,14 @@ class _AppointmentCardFromEntity extends StatelessWidget {
           ),
           const SizedBox(height: Spacing.xs),
           Text(
-            'Garage: $garageName',
+            l10n.apptGarageLine(garageName),
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: Spacing.xs),
           Text(
-            'Car: $carName',
+            l10n.apptCarLine(carName),
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
             ),
@@ -609,7 +620,7 @@ class _AppointmentCardFromEntity extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: () => _onRateGarage(context),
                 icon: const Icon(Icons.star_rounded),
-                label: const Text('Rate Garage'),
+                label: Text(AppLocalizations.of(context)!.svcRateGarage),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.warning,
                   foregroundColor: AppColors.textPrimary,
@@ -628,7 +639,7 @@ class _AppointmentCardFromEntity extends StatelessWidget {
                       foregroundColor: AppColors.textOnPrimary,
                       padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
                     ),
-                    child: const Text('Reschedule'),
+                    child: Text(AppLocalizations.of(context)!.svcReschedule),
                   ),
                 ),
                 const SizedBox(width: Spacing.sm),
@@ -640,7 +651,7 @@ class _AppointmentCardFromEntity extends StatelessWidget {
                       side: const BorderSide(color: AppColors.border),
                       padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
                     ),
-                    child: const Text('Cancel'),
+                    child: Text(AppLocalizations.of(context)!.svcCancel),
                   ),
                 ),
               ],
@@ -652,6 +663,7 @@ class _AppointmentCardFromEntity extends StatelessWidget {
 
   Future<void> _onRateGarage(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final reviewCtrl = TextEditingController();
     int stars = 0;
     final submit = await showDialog<bool>(
@@ -659,18 +671,19 @@ class _AppointmentCardFromEntity extends StatelessWidget {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setState) {
+            final dL10n = AppLocalizations.of(ctx)!;
             return AlertDialog(
-              title: const Text('Rate Garage'),
+              title: Text(dL10n.svcRateGarage),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('How was your service experience?'),
+                  Text(dL10n.svcRateExperienceTitle),
                   const SizedBox(height: Spacing.sm),
                   Text(
                     stars == 0
-                        ? 'Tap a star to rate'
-                        : '$stars star${stars == 1 ? '' : 's'} selected',
+                        ? dL10n.svcRateTapStar
+                        : dL10n.svcRateStarsSelected(stars),
                     style: AppTextStyles.bodySmall.copyWith(
                       color: stars == 0
                           ? AppColors.textSecondary
@@ -699,9 +712,9 @@ class _AppointmentCardFromEntity extends StatelessWidget {
                     controller: reviewCtrl,
                     minLines: 2,
                     maxLines: 4,
-                    decoration: const InputDecoration(
-                      hintText: 'Write optional feedback',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: dL10n.svcRateFeedbackHint,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ],
@@ -709,13 +722,13 @@ class _AppointmentCardFromEntity extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(false),
-                  child: const Text('Cancel'),
+                  child: Text(dL10n.commonCancel),
                 ),
                 FilledButton(
                   onPressed: stars == 0
                       ? null
                       : () => Navigator.of(ctx).pop(true),
-                  child: const Text('Submit'),
+                  child: Text(dL10n.commonSubmit),
                 ),
               ],
             );
@@ -734,8 +747,8 @@ class _AppointmentCardFromEntity extends StatelessWidget {
         },
       );
       messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Thanks! Your rating was submitted.'),
+        SnackBar(
+          content: Text(l10n.svcRatingThanks),
           backgroundColor: AppColors.success,
         ),
       );
@@ -749,7 +762,7 @@ class _AppointmentCardFromEntity extends StatelessWidget {
       final data = e.response?.data;
       final msg = (data is Map && data['error'] != null)
           ? data['error'].toString()
-          : 'Unable to submit rating';
+          : l10n.svcUnableSubmitRating;
       messenger.showSnackBar(
         SnackBar(content: Text(msg), backgroundColor: AppColors.danger),
       );
@@ -789,20 +802,23 @@ class _AppointmentCardFromEntity extends StatelessWidget {
   Future<void> _onCancel(BuildContext context) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Cancel appointment?'),
-        content: const Text('This action cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('No'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Yes', style: TextStyle(color: AppColors.danger)),
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        final dL10n = AppLocalizations.of(ctx)!;
+        return AlertDialog(
+          title: Text(dL10n.svcCancelApptTitle),
+          content: Text(dL10n.svcCancelApptBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(dL10n.commonNo),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(dL10n.commonYes, style: TextStyle(color: AppColors.danger)),
+            ),
+          ],
+        );
+      },
     );
     if (confirm == true && context.mounted) {
       context.read<AppointmentsBloc>().add(
@@ -811,20 +827,20 @@ class _AppointmentCardFromEntity extends StatelessWidget {
     }
   }
 
-  String _statusLabel(AppointmentStatus s) {
+  String _statusLabel(AppLocalizations l10n, AppointmentStatus s) {
     switch (s) {
       case AppointmentStatus.pending:
-        return 'Pending';
+        return l10n.apptStatusPending;
       case AppointmentStatus.approved:
-        return 'Confirmed';
+        return l10n.apptStatusConfirmed;
       case AppointmentStatus.rejected:
-        return 'Rejected';
+        return l10n.apptStatusRejected;
       case AppointmentStatus.inService:
-        return 'In Service';
+        return l10n.apptStatusInService;
       case AppointmentStatus.completed:
-        return 'Completed';
+        return l10n.apptStatusCompleted;
       case AppointmentStatus.cancelled:
-        return 'Cancelled';
+        return l10n.apptStatusCancelled;
     }
   }
 
@@ -877,19 +893,20 @@ class _NearbyCentersSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (centers.isEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Nearby Service Centers',
+            l10n.svcNearbyCentersTitle,
             style: AppTextStyles.titleSmall.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: Spacing.md),
           Text(
-            'No nearby garages found.',
+            l10n.svcNoNearbyGarages,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
             ),
@@ -905,7 +922,7 @@ class _NearbyCentersSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Nearby Service Centers',
+              l10n.svcNearbyCentersTitle,
               style: AppTextStyles.titleSmall.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -913,7 +930,7 @@ class _NearbyCentersSection extends StatelessWidget {
             TextButton(
               onPressed: () {},
               child: Text(
-                'View All',
+                l10n.commonViewAll,
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.secondary,
                   fontWeight: FontWeight.w500,
@@ -941,6 +958,7 @@ class _NearbyCenterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(Spacing.md),
       decoration: BoxDecoration(
@@ -973,7 +991,7 @@ class _NearbyCenterCard extends StatelessWidget {
                     ),
                     const SizedBox(height: Spacing.xs),
                     Text(
-                      center.isOpen ? 'Open' : 'Closed',
+                      center.isOpen ? l10n.svcOpen : l10n.svcClosed,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: center.isOpen
                             ? AppColors.success
@@ -1008,7 +1026,7 @@ class _NearbyCenterCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             child: Text(
-                              'View reviews',
+                              l10n.svcViewReviews,
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.textPrimary,
                                 fontWeight: FontWeight.w600,
@@ -1059,7 +1077,7 @@ class _NearbyCenterCard extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.calendar_today_outlined, size: 18),
-                  label: const Text('Book'),
+                  label: Text(AppLocalizations.of(context)!.svcBook),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.secondary,
                     foregroundColor: AppColors.textOnPrimary,
@@ -1072,7 +1090,7 @@ class _NearbyCenterCard extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => _callCenter(context, center.phone),
                   icon: const Icon(Icons.phone_outlined, size: 18),
-                  label: const Text('Call'),
+                  label: Text(AppLocalizations.of(context)!.svcCall),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textPrimary,
                     side: const BorderSide(color: AppColors.border),
@@ -1090,7 +1108,7 @@ class _NearbyCenterCard extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.near_me_outlined, size: 18),
-                  label: const Text('Route'),
+                  label: Text(AppLocalizations.of(context)!.svcRoute),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textPrimary,
                     side: const BorderSide(color: AppColors.border),
@@ -1107,11 +1125,12 @@ class _NearbyCenterCard extends StatelessWidget {
 
   static Future<void> _callCenter(BuildContext context, String rawPhone) async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final phone = rawPhone.trim();
     if (phone.isEmpty) {
       messenger.showSnackBar(
         SnackBar(
-          content: const Text('No phone number available for this garage.'),
+          content: Text(l10n.svcNoPhone),
           backgroundColor: AppColors.danger,
         ),
       );
@@ -1122,7 +1141,7 @@ class _NearbyCenterCard extends StatelessWidget {
     if (!ok) {
       messenger.showSnackBar(
         SnackBar(
-          content: const Text('Calling is not supported on this device.'),
+          content: Text(l10n.svcCallNotSupported),
           backgroundColor: AppColors.danger,
         ),
       );
@@ -1140,6 +1159,7 @@ class _NearbyCenterCard extends StatelessWidget {
       isScrollControlled: true,
       showDragHandle: true,
       builder: (ctx) {
+        final sheetL10n = AppLocalizations.of(ctx)!;
         return FutureBuilder<_GarageReviewsPayload>(
           future: _fetchGarageReviews(center.id),
           builder: (ctx, snapshot) {
@@ -1170,7 +1190,7 @@ class _NearbyCenterCard extends StatelessWidget {
                     ),
                     const SizedBox(height: Spacing.xs),
                     Text(
-                      'Reviews & Rating',
+                      sheetL10n.svcReviewsRatingTitle,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -1191,7 +1211,7 @@ class _NearbyCenterCard extends StatelessWidget {
                         ),
                         const SizedBox(width: Spacing.sm),
                         Text(
-                          '$total review${total == 1 ? '' : 's'}',
+                          sheetL10n.svcReviewCount(total),
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textSecondary,
                           ),
@@ -1207,7 +1227,7 @@ class _NearbyCenterCard extends StatelessWidget {
                       Expanded(
                         child: Center(
                           child: Text(
-                            'Could not load reviews right now.',
+                            sheetL10n.svcReviewsLoadError,
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: AppColors.danger,
                             ),
@@ -1218,7 +1238,7 @@ class _NearbyCenterCard extends StatelessWidget {
                       Expanded(
                         child: Center(
                           child: Text(
-                            'No reviews yet for this garage.',
+                            sheetL10n.svcReviewsEmpty,
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: AppColors.textSecondary,
                             ),
@@ -1232,7 +1252,10 @@ class _NearbyCenterCard extends StatelessWidget {
                           separatorBuilder: (_, __) => const Divider(height: 1),
                           itemBuilder: (_, i) {
                             final review = reviews[i];
-                            final displayName = review.driverDisplayName;
+                            final rawName = review.driverDisplayName.trim();
+                            final displayName = rawName.isNotEmpty
+                                ? rawName
+                                : sheetL10n.svcReviewAnonymousDriver;
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               child: Row(
@@ -1295,7 +1318,7 @@ class _NearbyCenterCard extends StatelessWidget {
                                             Expanded(
                                               child: Text(
                                                 review.comment.isEmpty
-                                                    ? 'No comment'
+                                                    ? sheetL10n.svcReviewNoComment
                                                     : review.comment,
                                                 style: AppTextStyles.bodySmall
                                                     .copyWith(
@@ -1306,7 +1329,8 @@ class _NearbyCenterCard extends StatelessWidget {
                                             ),
                                             const SizedBox(width: Spacing.sm),
                                             Text(
-                                              _formatReviewDate(
+                                              _NearbyCenterCard._formatReviewDate(
+                                                sheetL10n,
                                                 review.createdAt,
                                               ),
                                               style: AppTextStyles.bodySmall
@@ -1377,8 +1401,8 @@ class _NearbyCenterCard extends StatelessWidget {
     );
   }
 
-  static String _formatReviewDate(DateTime date) {
-    if (date.millisecondsSinceEpoch == 0) return 'Unknown date';
+  static String _formatReviewDate(AppLocalizations l10n, DateTime date) {
+    if (date.millisecondsSinceEpoch == 0) return l10n.svcUnknownDate;
     const months = 'Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec';
     final parts = months.split(',');
     final month = parts[date.month - 1];
@@ -1416,9 +1440,7 @@ class _GarageReviewItem {
   final String driverLastName;
 
   String get driverDisplayName {
-    final full = '$driverFirstName $driverLastName'.trim();
-    if (full.isNotEmpty) return full;
-    return 'Driver';
+    return '$driverFirstName $driverLastName'.trim();
   }
 
   String get initials {
@@ -1469,7 +1491,7 @@ class _MapPreviewCard extends StatelessWidget {
                   ),
                   const SizedBox(height: Spacing.sm),
                   Text(
-                    'Map View',
+                    AppLocalizations.of(context)!.svcMapView,
                     style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.w500,
                       color: AppColors.textSecondary,
@@ -1505,91 +1527,6 @@ class _MapPreviewCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _ServiceBottomNavBar extends StatelessWidget {
-  const _ServiceBottomNavBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      notchMargin: 8,
-      color: Colors.white,
-      child: SizedBox(
-        height: Dimensions.bottomNavHeight,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Spacing.lg,
-            vertical: Spacing.xs,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _ServiceBottomNavItem(
-                icon: Icons.home_filled,
-                label: 'Home',
-                onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/driver-dashboard',
-                  (route) => route.isFirst,
-                ),
-              ),
-              _ServiceBottomNavItem(
-                icon: Icons.directions_car_filled,
-                label: 'Vehicles',
-                onTap: () => Navigator.of(context).pushNamed('/vehicles'),
-              ),
-              const _ServiceBottomNavItem(
-                icon: Icons.handyman_outlined,
-                label: 'Service',
-                isActive: true,
-              ),
-              _ServiceBottomNavItem(
-                icon: Icons.people_alt_outlined,
-                label: 'Community',
-                onTap: () => Navigator.of(context).pushNamed('/community'),
-              ),
-              _ServiceBottomNavItem(
-                icon: Icons.menu_book_outlined,
-                label: 'Edu',
-                onTap: () => Navigator.of(context).pushNamed('/education'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ServiceBottomNavItem extends StatelessWidget {
-  const _ServiceBottomNavItem({
-    required this.icon,
-    required this.label,
-    this.isActive = false,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive ? Colors.black : AppColors.textSecondary;
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: Spacing.xs),
-          Text(label, style: AppTextStyles.labelSmall.copyWith(color: color)),
-        ],
       ),
     );
   }

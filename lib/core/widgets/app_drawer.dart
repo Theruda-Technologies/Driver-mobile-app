@@ -7,6 +7,7 @@ import '../constants/border_radius.dart';
 import '../constants/spacing.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
+import '../../l10n/app_localizations.dart';
 import '../../features/auth/domain/entities/driver_user.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_event.dart';
@@ -27,6 +28,7 @@ class AppDrawer extends StatelessWidget {
           (prev is AuthAuthenticated && next is AuthAuthenticated &&
               prev.user != next.user),
       builder: (context, state) {
+        final l10n = AppLocalizations.of(context)!;
         final user = state is AuthAuthenticated ? state.user : null;
         return Drawer(
           backgroundColor: Colors.white,
@@ -36,68 +38,69 @@ class AppDrawer extends StatelessWidget {
               children: [
                 _DrawerHeader(user: user, onClose: () => Navigator.of(context).pop()),
                 const SizedBox(height: Spacing.sm),
-                _SectionLabel(label: 'NAVIGATION'),
+                _SectionLabel(label: l10n.drawerNavSection),
                 _DrawerTile(
                   icon: Icons.home_outlined,
                   activeIcon: Icons.home,
-                  label: 'Home',
+                  label: l10n.drawerHome,
                   isActive: currentRoute == '/driver-dashboard',
                   onTap: () => _navigate(context, '/driver-dashboard'),
                 ),
                 _DrawerTile(
                   icon: Icons.directions_car_outlined,
                   activeIcon: Icons.directions_car,
-                  label: 'My Vehicles',
+                  label: l10n.drawerMyVehicles,
                   isActive: currentRoute == '/vehicles',
                   onTap: () => _navigate(context, '/vehicles'),
                 ),
                 _DrawerTile(
                   icon: Icons.build_outlined,
                   activeIcon: Icons.build,
-                  label: 'Service',
+                  label: l10n.drawerService,
                   isActive: currentRoute == '/services',
                   onTap: () => _navigate(context, '/services'),
                 ),
                 _DrawerTile(
                   icon: Icons.people_outline,
                   activeIcon: Icons.people,
-                  label: 'Community',
+                  label: l10n.drawerCommunity,
                   isActive: currentRoute == '/community',
                   onTap: () => _navigate(context, '/community'),
                 ),
                 _DrawerTile(
                   icon: Icons.menu_book_outlined,
                   activeIcon: Icons.menu_book,
-                  label: 'Education',
+                  label: l10n.drawerEducation,
                   isActive: currentRoute == '/education',
                   onTap: () => _navigate(context, '/education'),
                 ),
                 const SizedBox(height: Spacing.md),
-                _SectionLabel(label: 'ACCOUNT'),
+                _SectionLabel(label: l10n.drawerAccountSection),
                 _DrawerTile(
                   icon: Icons.person_outline,
                   activeIcon: Icons.person,
-                  label: 'Profile',
+                  label: l10n.drawerProfile,
                   isActive: currentRoute == '/profile',
                   onTap: () => _navigate(context, '/profile'),
                 ),
                 _DrawerTile(
                   icon: Icons.settings_outlined,
                   activeIcon: Icons.settings,
-                  label: 'Settings',
+                  label: l10n.drawerSettings,
                   isActive: currentRoute == '/settings',
                   onTap: () => _navigate(context, '/settings'),
                 ),
                 _DrawerTile(
                   icon: Icons.help_outline,
                   activeIcon: Icons.help,
-                  label: 'Help & Support',
+                  label: l10n.drawerHelpSupport,
                   isActive: false,
                   onTap: () => _navigate(context, '/driver-dashboard'),
                 ),
                 const Spacer(),
                 const Divider(height: 1),
                 _LogoutTile(
+                  label: l10n.drawerLogout,
                   onTap: () => _logout(context),
                 ),
                 const SizedBox(height: Spacing.md),
@@ -133,8 +136,8 @@ class _DrawerHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final name = user != null
         ? '${user!.firstName} ${user!.lastName}'.trim()
-        : 'Guest';
-    final email = user?.email ?? '—';
+        : AppLocalizations.of(context)!.commonGuest;
+    final email = user?.email ?? AppLocalizations.of(context)!.commonEmDash;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(Spacing.lg, Spacing.md, Spacing.sm, Spacing.lg),
@@ -251,8 +254,9 @@ class _DrawerTile extends StatelessWidget {
 }
 
 class _LogoutTile extends StatelessWidget {
-  const _LogoutTile({required this.onTap});
+  const _LogoutTile({required this.label, required this.onTap});
 
+  final String label;
   final VoidCallback onTap;
 
   @override
@@ -260,7 +264,7 @@ class _LogoutTile extends StatelessWidget {
     return ListTile(
       leading: Icon(Icons.logout, color: AppColors.danger, size: 24),
       title: Text(
-        'Logout',
+        label,
         style: AppTextStyles.bodyMedium.copyWith(
           color: AppColors.danger,
           fontWeight: FontWeight.w600,

@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -102,8 +103,9 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
             _selectedInsurancePath = file.path;
           });
           if (mounted) {
+            final l10n = AppLocalizations.of(context)!;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Selected: $name'), behavior: SnackBarBehavior.floating),
+              SnackBar(content: Text(l10n.addVehFileSelected(name)), behavior: SnackBarBehavior.floating),
             );
           }
         }
@@ -111,9 +113,10 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
     } catch (e, st) {
       debugPrint('Insurance file pick error: $e $st');
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not open file picker: $e'),
+            content: Text(l10n.addVehFilePickerError('$e')),
             backgroundColor: AppColors.danger,
             behavior: SnackBarBehavior.floating,
           ),
@@ -140,8 +143,9 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
             _selectedRegistrationPath = file.path;
           });
           if (mounted) {
+            final l10n = AppLocalizations.of(context)!;
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Selected: $name'), behavior: SnackBarBehavior.floating),
+              SnackBar(content: Text(l10n.addVehFileSelected(name)), behavior: SnackBarBehavior.floating),
             );
           }
         }
@@ -149,9 +153,10 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
     } catch (e, st) {
       debugPrint('Registration file pick error: $e $st');
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not open file picker: $e'),
+            content: Text(l10n.addVehFilePickerError('$e')),
             backgroundColor: AppColors.danger,
             behavior: SnackBarBehavior.floating,
           ),
@@ -185,10 +190,11 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
         listenWhen: (prev, curr) =>
             curr is VehicleActionSuccess || curr is VehiclesFailure,
         listener: (context, state) {
+          final l10n = AppLocalizations.of(context)!;
           if (state is VehicleActionSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(isEdit ? 'Vehicle updated.' : 'Vehicle added successfully.'),
+                content: Text(isEdit ? l10n.addVehSuccessUpdated : l10n.addVehSuccessAdded),
                 backgroundColor: AppColors.success,
                 behavior: SnackBarBehavior.floating,
               ),
@@ -205,7 +211,9 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
             );
           }
         },
-        builder: (context, state) => Scaffold(
+        builder: (context, state) {
+          final l10n = AppLocalizations.of(context)!;
+          return Scaffold(
           backgroundColor: AppColors.background,
           appBar: AppBar(
             backgroundColor: AppColors.surface,
@@ -215,7 +223,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             title: Text(
-              isEdit ? 'Edit Vehicle' : 'Add Vehicle',
+              isEdit ? l10n.vehDetailEditVehicle : l10n.addVehAddVehicle,
               style: AppTextStyles.titleMedium.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -320,7 +328,8 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                               onAdd: () => _submit(context),
                               onEditDetails: () => setState(() => _step = 0),
                             ),
-        ),
+        );
+      },
       ),
     );
   }
@@ -349,9 +358,10 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
     final mileage = int.tryParse(_mileageCtrl.text.trim());
 
     if (make.isEmpty || model.isEmpty || plate.isEmpty) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill Make, Model and License Plate.'),
+        SnackBar(
+          content: Text(l10n.addVehFillRequired),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -450,6 +460,7 @@ class _EditForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: Spacing.lg),
       child: Column(
@@ -528,7 +539,7 @@ class _EditForm extends StatelessWidget {
                 foregroundColor: AppColors.textOnPrimary,
                 padding: const EdgeInsets.symmetric(vertical: Spacing.md),
               ),
-              child: const Text('Save Changes'),
+              child: Text(l10n.addVehSaveChanges),
             ),
           ),
         ],
@@ -554,6 +565,7 @@ class _Step1Basic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: Spacing.lg),
       child: Column(
@@ -574,7 +586,7 @@ class _Step1Basic extends StatelessWidget {
               foregroundColor: AppColors.textOnPrimary,
               padding: const EdgeInsets.symmetric(vertical: Spacing.md),
             ),
-            child: const Text('Continue'),
+            child: Text(l10n.commonContinue),
           ),
         ],
       ),
@@ -603,6 +615,7 @@ class _Step2Technical extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: Spacing.lg),
       child: Column(
@@ -635,7 +648,7 @@ class _Step2Technical extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: onBack,
                   style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: Spacing.md)),
-                  child: const Text('Back'),
+                  child: Text(l10n.commonBack),
                 ),
               ),
               const SizedBox(width: Spacing.md),
@@ -647,7 +660,7 @@ class _Step2Technical extends StatelessWidget {
                     foregroundColor: AppColors.textOnPrimary,
                     padding: const EdgeInsets.symmetric(vertical: Spacing.md),
                   ),
-                  child: const Text('Continue'),
+                  child: Text(l10n.commonContinue),
                 ),
               ),
             ],
@@ -677,6 +690,7 @@ class _Step3Upload extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: Spacing.lg),
       child: Column(
@@ -704,7 +718,7 @@ class _Step3Upload extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: onBack,
                   style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: Spacing.md)),
-                  child: const Text('Back'),
+                  child: Text(l10n.commonBack),
                 ),
               ),
               const SizedBox(width: Spacing.md),
@@ -716,7 +730,7 @@ class _Step3Upload extends StatelessWidget {
                     foregroundColor: AppColors.textOnPrimary,
                     padding: const EdgeInsets.symmetric(vertical: Spacing.md),
                   ),
-                  child: const Text('Continue'),
+                  child: Text(l10n.commonContinue),
                 ),
               ),
             ],
@@ -744,6 +758,7 @@ class _UploadCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(Spacing.lg),
       decoration: BoxDecoration(
@@ -758,7 +773,7 @@ class _UploadCard extends StatelessWidget {
           if (selectedFileName != null) ...[
             const SizedBox(height: Spacing.xs),
             Text(
-              'Selected: $selectedFileName',
+              l10n.addVehFileSelected(selectedFileName!),
               style: AppTextStyles.bodySmall.copyWith(color: AppColors.success, fontSize: 12),
             ),
           ],
@@ -771,7 +786,7 @@ class _UploadCard extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: onTap,
               icon: const Icon(Icons.upload_file, size: 20),
-              label: const Text('Select file'),
+              label: Text(l10n.addVehSelectFile),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.secondary,
                 foregroundColor: AppColors.textOnPrimary,
@@ -840,8 +855,12 @@ class _Step4Confirm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final mileageNum = int.tryParse(mileage);
-    final mileageDisplay = mileageNum != null ? '$mileageNum miles' : (mileage.isEmpty ? '—' : '$mileage miles');
+    final em = l10n.commonEmDash;
+    final mileageDisplay = mileageNum != null
+        ? '$mileageNum ${l10n.commonMilesUnit}'
+        : (mileage.isEmpty ? em : '$mileage ${l10n.commonMilesUnit}');
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: Spacing.lg),
       child: Column(
@@ -856,16 +875,16 @@ class _Step4Confirm extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Vehicle Summary', style: AppTextStyles.titleSmall.copyWith(color: AppColors.textPrimary)),
+                Text(l10n.addVehVehicleSummary, style: AppTextStyles.titleSmall.copyWith(color: AppColors.textPrimary)),
                 const SizedBox(height: Spacing.md),
-                _SummaryRow('Make', make.isEmpty ? '—' : make),
-                _SummaryRow('Model', model.isEmpty ? '—' : model),
-                _SummaryRow('Year', year.isEmpty ? '—' : year),
-                _SummaryRow('Plate', plate.isEmpty ? '—' : plate),
-                _SummaryRow('Color', color.isEmpty ? '—' : color),
-                _SummaryRow('VIN', vin.isEmpty ? '—' : vin),
+                _SummaryRow('Make', make.isEmpty ? em : make),
+                _SummaryRow('Model', model.isEmpty ? em : model),
+                _SummaryRow('Year', year.isEmpty ? em : year),
+                _SummaryRow('Plate', plate.isEmpty ? em : plate),
+                _SummaryRow('Color', color.isEmpty ? em : color),
+                _SummaryRow('VIN', vin.isEmpty ? em : vin),
                 _SummaryRow('Mileage', mileageDisplay),
-                _SummaryRow('Fuel Type', fuelType ?? '—'),
+                _SummaryRow('Fuel Type', fuelType ?? em),
               ],
             ),
           ),
@@ -883,7 +902,7 @@ class _Step4Confirm extends StatelessWidget {
                 const SizedBox(width: Spacing.md),
                 Expanded(
                   child: Text(
-                    'Ready to add this vehicle in your garage. You can edit details anytime.',
+                    l10n.addVehReadyConfirmBanner,
                     style: AppTextStyles.bodySmall.copyWith(color: AppColors.textPrimary),
                   ),
                 ),
@@ -900,7 +919,7 @@ class _Step4Confirm extends StatelessWidget {
                 foregroundColor: AppColors.textOnPrimary,
                 padding: const EdgeInsets.symmetric(vertical: Spacing.md),
               ),
-              child: const Text('Add Vehicle'),
+              child: Text(l10n.addVehAddVehicle),
             ),
           ),
           const SizedBox(height: Spacing.sm),
@@ -912,7 +931,7 @@ class _Step4Confirm extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: Spacing.md),
                 side: const BorderSide(color: AppColors.border),
               ),
-              child: const Text('Edit Details'),
+              child: Text(l10n.addVehEditDetails),
             ),
           ),
         ],

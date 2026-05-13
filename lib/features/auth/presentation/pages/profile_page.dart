@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -53,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     context.read<AuthBloc>().add(UpdateProfileRequested(updated));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile updated')),
+      SnackBar(content: Text(AppLocalizations.of(context)!.profileUpdated)),
     );
   }
 
@@ -76,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
             backgroundColor: Colors.white,
             elevation: 0,
             title: Text(
-              'Profile',
+              AppLocalizations.of(context)!.profileTitle,
               style: AppTextStyles.titleMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -96,6 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildBody(BuildContext context, AuthState state) {
+    final l10n = AppLocalizations.of(context)!;
     if (state is AuthAuthenticated) {
       _initFromUser(state.user);
       return SingleChildScrollView(
@@ -104,44 +106,44 @@ class _ProfilePageState extends State<ProfilePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Update your name and email. Changes appear in the drawer.',
+              l10n.profileSubtitle,
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: Spacing.lg),
-            Text('First Name', style: AppTextStyles.labelMedium),
+            Text(l10n.profileFirstName, style: AppTextStyles.labelMedium),
             const SizedBox(height: Spacing.xs),
             TextField(
               controller: _firstNameController,
-              decoration: const InputDecoration(
-                hintText: 'First name',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: l10n.profileHintFirstName,
+                border: const OutlineInputBorder(),
                 filled: true,
                 fillColor: Colors.white,
               ),
             ),
             const SizedBox(height: Spacing.lg),
-            Text('Last Name', style: AppTextStyles.labelMedium),
+            Text(l10n.profileLastName, style: AppTextStyles.labelMedium),
             const SizedBox(height: Spacing.xs),
             TextField(
               controller: _lastNameController,
-              decoration: const InputDecoration(
-                hintText: 'Last name',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: l10n.profileHintLastName,
+                border: const OutlineInputBorder(),
                 filled: true,
                 fillColor: Colors.white,
               ),
             ),
             const SizedBox(height: Spacing.lg),
-            Text('Email', style: AppTextStyles.labelMedium),
+            Text(l10n.profileEmail, style: AppTextStyles.labelMedium),
             const SizedBox(height: Spacing.xs),
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                hintText: 'Email',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: l10n.profileHintEmail,
+                border: const OutlineInputBorder(),
                 filled: true,
                 fillColor: Colors.white,
               ),
@@ -164,7 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 child: Text(
-                  'Save changes',
+                  l10n.profileSaveChanges,
                   style: AppTextStyles.buttonMedium.copyWith(
                     color: AppColors.secondary,
                   ),
@@ -178,6 +180,6 @@ class _ProfilePageState extends State<ProfilePage> {
     if (state is AuthLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    return const Center(child: Text('Please sign in.'));
+    return Center(child: Text(l10n.profilePleaseSignIn));
   }
 }

@@ -14,6 +14,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/auth/jwt_expiry.dart';
+import 'core/locale/app_locale_data.dart';
 import 'core/navigation/app_navigator.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/data/datasources/auth_local_datasource.dart';
@@ -50,6 +51,7 @@ import 'features/education/presentation/pages/education_center_page.dart';
 import 'features/education/presentation/pages/education_articles_list_page.dart';
 import 'features/ai/presentation/pages/ai_chat_page.dart';
 import 'features/ai/presentation/pages/ai_chat_history_page.dart';
+import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,8 +75,11 @@ void main() async {
     debugPrint('USER_TOKEN: $token');
   }
 
+  final localePrefs = await SharedPreferences.getInstance();
+  final savedLocaleCode = localePrefs.getString('app_locale_code');
+
   // Run the app
-  runApp(const App());
+  runApp(App(savedLocaleCode: savedLocaleCode));
 }
 
 /// Root application widget
@@ -84,8 +89,37 @@ void main() async {
 /// - Routing (when GoRouter is configured)
 /// - Global providers (BLoC providers, etc.)
 /// - Error handling
-class App extends StatelessWidget {
-  const App({super.key});
+class App extends StatefulWidget {
+  const App({super.key, this.savedLocaleCode});
+
+  /// Persisted `Locale.languageCode` from [SharedPreferences] (`en` or `am`), or null for device default.
+  final String? savedLocaleCode;
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  Locale? _locale;
+
+  @override
+  void initState() {
+    super.initState();
+    _locale = _localeFromCode(widget.savedLocaleCode);
+  }
+
+  static Locale? _localeFromCode(String? code) {
+    if (code == 'am') return const Locale('am');
+    if (code == 'en') return const Locale('en');
+    return null;
+  }
+
+  Future<void> _persistLocale(Locale locale) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('app_locale_code', locale.languageCode);
+    if (!mounted) return;
+    setState(() => _locale = locale);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +132,11 @@ class App extends StatelessWidget {
                 ..add(const NotificationsLoadRequested()),
         ),
       ],
-      child: const _AuthSessionShell(),
+      child: AppLocaleData(
+        locale: _locale,
+        setLocale: _persistLocale,
+        child: const _AuthSessionShell(),
+      ),
     );
   }
 }
@@ -156,7 +194,11 @@ class _AuthSessionShellState extends State<_AuthSessionShell>
       },
       child: MaterialApp(
         navigatorKey: appNavigatorKey,
-        title: 'Driver Assistance',
+        onGenerateTitle: (context) =>
+            AppLocalizations.of(context)?.appTitle ?? 'Driver Assistance',
+        locale: AppLocaleData.of(context).locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         // Force light theme until we implement a proper dark theme.

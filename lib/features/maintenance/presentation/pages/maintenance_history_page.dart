@@ -41,7 +41,7 @@ class _MaintenanceHistoryPageState extends State<MaintenanceHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const NavAppBar(title: 'CarCare', notificationCount: 3),
+      appBar: NavAppBar.mainShell(context),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(Spacing.lg, Spacing.sm, Spacing.lg, Spacing.lg),

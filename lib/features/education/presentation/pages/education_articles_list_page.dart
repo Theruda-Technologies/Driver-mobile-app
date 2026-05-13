@@ -3,10 +3,12 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/widgets/simple_title_app_bar.dart';
 import '../../../../injection/service_locator.dart';
 import '../../domain/entities/education_article.dart';
 import '../bloc/education_bloc.dart';
@@ -64,14 +66,12 @@ class _EducationArticlesListViewState extends State<_EducationArticlesListView> 
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        foregroundColor: AppColors.textPrimary,
+      appBar: SimpleTitleAppBar(
         title: Text(
-          _filter != null ? '${_filter!.displayLabel} articles' : 'All articles',
+          _filter != null ? l10n.eduArticlesInCategory(_filter!.displayLabel) : l10n.eduAllArticlesTitle,
           style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700),
         ),
       ),
@@ -89,7 +89,7 @@ class _EducationArticlesListViewState extends State<_EducationArticlesListView> 
                     FilledButton(
                       onPressed: () =>
                           context.read<EducationBloc>().add(const EducationLoadRequested()),
-                      child: const Text('Retry'),
+                      child: Text(l10n.eduRetry),
                     ),
                   ],
                 ),
@@ -112,7 +112,7 @@ class _EducationArticlesListViewState extends State<_EducationArticlesListView> 
                   child: Row(
                     children: [
                       _FilterChip(
-                        label: 'All',
+                        label: l10n.tabAll,
                         selected: _filter == null,
                         onTap: () => setState(() => _filter = null),
                       ),
@@ -141,7 +141,7 @@ class _EducationArticlesListViewState extends State<_EducationArticlesListView> 
                 child: filtered.isEmpty
                     ? Center(
                         child: Text(
-                          'No articles in this category.',
+                          l10n.eduNoArticlesInCategory,
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.textSecondary,
                           ),
@@ -154,6 +154,7 @@ class _EducationArticlesListViewState extends State<_EducationArticlesListView> 
                         itemBuilder: (context, index) {
                           final a = filtered[index];
                           return _ArticleRow(
+                            l10n: l10n,
                             article: a,
                             onTap: () {
                               Navigator.of(context).push<void>(
@@ -210,8 +211,9 @@ class _FilterChip extends StatelessWidget {
 }
 
 class _ArticleRow extends StatelessWidget {
-  const _ArticleRow({required this.article, required this.onTap});
+  const _ArticleRow({required this.l10n, required this.article, required this.onTap});
 
+  final AppLocalizations l10n;
   final EducationArticle article;
   final VoidCallback onTap;
 
@@ -240,7 +242,7 @@ class _ArticleRow extends StatelessWidget {
                     ),
                     const SizedBox(height: Spacing.xs),
                     Text(
-                      '${article.topicTag} • ${article.estimatedReadMinutes} min',
+                      '${article.topicTag} • ${l10n.eduReadMinutes(article.estimatedReadMinutes)}',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textSecondary,
                       ),

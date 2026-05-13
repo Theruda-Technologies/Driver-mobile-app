@@ -6,9 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
+import '../../../../core/locale/app_locale_data.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_drawer.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../injection/service_locator.dart';
 import '../../application/usecases/change_password_usecase.dart';
 import '../bloc/auth_bloc.dart';
@@ -56,13 +58,13 @@ class _SettingsPageState extends State<SettingsPage> {
       _newPasswordCtrl.clear();
       _confirmPasswordCtrl.clear();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password changed successfully')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.settingsPasswordChanged)),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_message(e)),
+          content: Text(_message(e, AppLocalizations.of(context)!)),
           backgroundColor: AppColors.danger,
         ),
       );
@@ -71,18 +73,18 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  String _message(Object e) {
+  String _message(Object e, AppLocalizations l10n) {
     if (e is DioException) {
       final data = e.response?.data;
       if (data is Map && data['error'] != null) return data['error'].toString();
       if (data is Map && data['message'] != null) {
         return data['message'].toString();
       }
-      return e.message ?? 'Request failed';
+      return e.message ?? l10n.settingsRequestFailed;
     }
     final text = e.toString();
     if (text.length < 140) return text;
-    return 'Unable to change password right now.';
+    return l10n.settingsUnableChangePassword;
   }
 
   @override
@@ -94,6 +96,9 @@ class _SettingsPageState extends State<SettingsPage> {
         }
       },
       builder: (context, state) {
+        final l10n = AppLocalizations.of(context)!;
+        final localeData = AppLocaleData.of(context);
+        final selectedCode = localeData.locale?.languageCode;
         return Scaffold(
           backgroundColor: AppColors.background,
           drawer: const AppDrawer(currentRoute: '/settings'),
@@ -101,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
             backgroundColor: Colors.white,
             elevation: 0,
             title: Text(
-              'Settings',
+              l10n.settingsTitle,
               style: AppTextStyles.titleMedium.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -122,14 +127,50 @@ class _SettingsPageState extends State<SettingsPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Change Password',
+                    l10n.settingsLanguageSection,
+                    style: AppTextStyles.titleMedium.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.sm),
+                  Card(
+                    margin: EdgeInsets.zero,
+                    elevation: 0,
+                    color: AppColors.surface,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(BorderRadiusValues.lg),
+                      side: const BorderSide(color: AppColors.surfaceMuted),
+                    ),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          title: Text(l10n.settingsLanguageEnglish),
+                          trailing: selectedCode == 'en'
+                              ? const Icon(Icons.check, color: AppColors.primary)
+                              : null,
+                          onTap: () => localeData.setLocale(const Locale('en')),
+                        ),
+                        const Divider(height: 1),
+                        ListTile(
+                          title: Text(l10n.settingsLanguageAmharic),
+                          trailing: selectedCode == 'am'
+                              ? const Icon(Icons.check, color: AppColors.primary)
+                              : null,
+                          onTap: () => localeData.setLocale(const Locale('am')),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: Spacing.xl),
+                  Text(
+                    l10n.settingsChangePasswordTitle,
                     style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: Spacing.xs),
                   Text(
-                    'Use your current password to set a new one.',
+                    l10n.settingsChangePasswordSubtitle,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -137,12 +178,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: Spacing.lg),
                   _buildPasswordField(
                     controller: _currentPasswordCtrl,
-                    label: 'Current password',
+                    label: l10n.settingsCurrentPasswordLabel,
                     obscure: !_showCurrent,
                     onToggle: () => setState(() => _showCurrent = !_showCurrent),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Current password is required';
+                        return l10n.settingsValidatorCurrentRequired;
                       }
                       return null;
                     },
@@ -150,17 +191,17 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: Spacing.md),
                   _buildPasswordField(
                     controller: _newPasswordCtrl,
-                    label: 'New password',
+                    label: l10n.settingsNewPasswordLabel,
                     obscure: !_showNew,
                     onToggle: () => setState(() => _showNew = !_showNew),
                     validator: (value) {
                       final v = value?.trim() ?? '';
-                      if (v.isEmpty) return 'New password is required';
+                      if (v.isEmpty) return l10n.settingsValidatorNewRequired;
                       if (v.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return l10n.settingsValidatorNewMin6;
                       }
                       if (v == _currentPasswordCtrl.text.trim()) {
-                        return 'New password must be different';
+                        return l10n.settingsValidatorNewDifferent;
                       }
                       return null;
                     },
@@ -168,15 +209,15 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: Spacing.md),
                   _buildPasswordField(
                     controller: _confirmPasswordCtrl,
-                    label: 'Confirm new password',
+                    label: l10n.settingsConfirmNewPasswordLabel,
                     obscure: !_showConfirm,
                     onToggle: () => setState(() => _showConfirm = !_showConfirm),
                     validator: (value) {
                       if ((value?.trim() ?? '').isEmpty) {
-                        return 'Please confirm your new password';
+                        return l10n.settingsValidatorConfirmRequired;
                       }
                       if (value!.trim() != _newPasswordCtrl.text.trim()) {
-                        return 'Passwords do not match';
+                        return l10n.settingsValidatorPasswordsMismatch;
                       }
                       return null;
                     },
@@ -206,7 +247,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             )
                           : Text(
-                              'Update password',
+                              l10n.settingsUpdatePasswordButton,
                               style: AppTextStyles.buttonMedium.copyWith(
                                 color: AppColors.secondary,
                               ),

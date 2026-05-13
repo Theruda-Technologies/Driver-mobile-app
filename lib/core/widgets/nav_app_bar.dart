@@ -3,6 +3,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../constants/dimensions.dart';
 import '../constants/spacing.dart';
 import '../theme/app_colors.dart';
@@ -31,6 +32,17 @@ class NavAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   /// Badge count on notification icon; null hides badge.
   final int? notificationCount;
+
+  /// Brand title + drawer + notifications + profile (main driver shell).
+  factory NavAppBar.mainShell(
+    BuildContext context, {
+    bool showStaticNotificationBadge = true,
+  }) {
+    return NavAppBar(
+      title: AppLocalizations.of(context)!.brandCarCare,
+      notificationCount: showStaticNotificationBadge ? 3 : null,
+    );
+  }
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);

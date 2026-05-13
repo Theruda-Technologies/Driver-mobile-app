@@ -6,13 +6,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/border_radius.dart';
-import '../../../../core/constants/dimensions.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_drawer.dart';
+import '../../../../core/widgets/driver_shell_bottom_nav_bar.dart';
 import '../../../../core/widgets/nav_app_bar.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
@@ -64,7 +65,7 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(currentRoute: '/community'),
-      appBar: const NavAppBar(title: 'CarCare', notificationCount: 3),
+      appBar: NavAppBar.mainShell(context),
       body: BlocListener<CommunityBloc, CommunityState>(
         listenWhen: (previous, current) =>
             current is CommunityFailure && previous is CommunityLoaded,
@@ -79,6 +80,7 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
         },
         child: BlocBuilder<CommunityBloc, CommunityState>(
           builder: (context, state) {
+            final l10n = AppLocalizations.of(context)!;
             final loaded = state is CommunityLoaded ? state : null;
             final posts = loaded?.posts ?? const <Post>[];
             final bookmarked = loaded?.bookmarkedPosts ?? const <Post>[];
@@ -103,7 +105,7 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Community',
+                        l10n.commCommunityTitle,
                         style: AppTextStyles.titleLarge.copyWith(
                           color: AppColors.textPrimary,
                           fontWeight: FontWeight.w700,
@@ -111,7 +113,7 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Connect with car owners',
+                        l10n.commCommunitySubtitle,
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textSecondary,
                         ),
@@ -142,7 +144,7 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
                             );
                           },
                           icon: const Icon(Icons.add_rounded, size: 18),
-                          label: const Text('Create Post'),
+                          label: Text(l10n.commCreatePost),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.textPrimary,
                             foregroundColor: Colors.white,
@@ -200,7 +202,7 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
                             children: [
                               const SizedBox(height: 120),
                               Text(
-                                'No posts found.',
+                                l10n.commNoPostsFound,
                                 style: AppTextStyles.bodyMedium.copyWith(
                                   color: AppColors.textSecondary,
                                 ),
@@ -257,7 +259,7 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
           },
         ),
       ),
-      bottomNavigationBar: const _CommunityBottomNavBar(),
+      bottomNavigationBar: const DriverShellBottomNavBar(current: DriverShellTab.community),
     );
   }
 
@@ -319,41 +321,42 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setState) {
+            final loc = AppLocalizations.of(ctx)!;
             return AlertDialog(
-              title: const Text('Report Post'),
+              title: Text(loc.commReportPost),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   DropdownButtonFormField<String>(
                     initialValue: reason,
-                    items: const [
-                      DropdownMenuItem(value: 'SPAM', child: Text('Spam')),
+                    items: [
+                      DropdownMenuItem(value: 'SPAM', child: Text(loc.commReportSpam)),
                       DropdownMenuItem(
                         value: 'HARASSMENT',
-                        child: Text('Harassment'),
+                        child: Text(loc.commReportHarassment),
                       ),
                       DropdownMenuItem(
                         value: 'HATE_SPEECH',
-                        child: Text('Hate speech'),
+                        child: Text(loc.commReportHate),
                       ),
                       DropdownMenuItem(
                         value: 'FALSE_INFORMATION',
-                        child: Text('False information'),
+                        child: Text(loc.commReportFalseInfo),
                       ),
                       DropdownMenuItem(
                         value: 'VIOLENCE',
-                        child: Text('Violence'),
+                        child: Text(loc.commReportViolence),
                       ),
                       DropdownMenuItem(
                         value: 'NUDITY_OR_SEXUAL_CONTENT',
-                        child: Text('Nudity or sexual content'),
+                        child: Text(loc.commReportNudity),
                       ),
                       DropdownMenuItem(
                         value: 'SCAM_OR_FRAUD',
-                        child: Text('Scam or fraud'),
+                        child: Text(loc.commReportScam),
                       ),
-                      DropdownMenuItem(value: 'OTHER', child: Text('Other')),
+                      DropdownMenuItem(value: 'OTHER', child: Text(loc.commReportOther)),
                     ],
                     onChanged: (v) {
                       if (v != null) setState(() => reason = v);
@@ -365,9 +368,9 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
                       controller: detailsCtrl,
                       minLines: 3,
                       maxLines: 5,
-                      decoration: const InputDecoration(
-                        hintText: 'Tell us what is wrong',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        hintText: loc.commReportDetailsHint,
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                   ],
@@ -376,11 +379,11 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(false),
-                  child: const Text('Cancel'),
+                  child: Text(loc.commonCancel),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.of(ctx).pop(true),
-                  child: const Text('Report'),
+                  child: Text(loc.commonReport),
                 ),
               ],
             );
@@ -410,6 +413,7 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
       isScrollControlled: true,
       showDragHandle: true,
       builder: (sheetContext) {
+        final loc = AppLocalizations.of(sheetContext)!;
         return BlocProvider.value(
           value: bloc,
           child: Padding(
@@ -424,7 +428,7 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
               child: Column(
                 children: [
                   Text(
-                    'Comments',
+                    loc.commComments,
                     style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
@@ -452,7 +456,7 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
                         if (comments.isEmpty) {
                           return Center(
                             child: Text(
-                              'No comments yet.',
+                              loc.commNoComments,
                               style: AppTextStyles.bodyMedium.copyWith(
                                 color: AppColors.textSecondary,
                               ),
@@ -491,7 +495,7 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
                               ),
                               trailing: c.isMine
                                   ? PopupMenuButton<String>(
-                                      tooltip: 'Actions',
+                                      tooltip: loc.commActionsTooltip,
                                       icon: const Icon(
                                         Icons.more_vert_rounded,
                                         color: AppColors.textSecondary,
@@ -506,10 +510,10 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
                                           );
                                         }
                                       },
-                                      itemBuilder: (_) => const [
+                                      itemBuilder: (_) => [
                                         PopupMenuItem<String>(
                                           value: 'delete',
-                                          child: Text('Delete'),
+                                          child: Text(loc.commonDelete),
                                         ),
                                       ],
                                     )
@@ -526,9 +530,9 @@ class _CommunityFeedPageState extends State<CommunityFeedPage> {
                       Expanded(
                         child: TextField(
                           controller: inputCtrl,
-                          decoration: const InputDecoration(
-                            hintText: 'Write a comment',
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            hintText: loc.commWriteComment,
+                            border: const OutlineInputBorder(),
                           ),
                         ),
                       ),
@@ -599,9 +603,10 @@ class _PostCardState extends State<_PostCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final post = widget.post;
     final time = post.createdAt;
-    final timeStr = time != null ? _timeAgo(time) : null;
+    final timeStr = time != null ? _timeAgo(time, l10n) : null;
     final imageUrls = post.imageUrls;
     final initials = post.author.initials;
     final displayName = post.author.displayName;
@@ -666,19 +671,20 @@ class _PostCardState extends State<_PostCard> {
                   color: AppColors.textSecondary,
                 ),
                 itemBuilder: (ctx) {
+                  final loc = AppLocalizations.of(ctx)!;
                   if (widget.isMine) {
-                    return const [
-                      PopupMenuItem<String>(value: 'edit', child: Text('Edit')),
+                    return [
+                      PopupMenuItem<String>(value: 'edit', child: Text(loc.commonEdit)),
                       PopupMenuItem<String>(
                         value: 'delete',
-                        child: Text('Delete'),
+                        child: Text(loc.commonDelete),
                       ),
                     ];
                   }
-                  return const [
+                  return [
                     PopupMenuItem<String>(
                       value: 'report',
-                      child: Text('Report'),
+                      child: Text(loc.commonReport),
                     ),
                   ];
                 },
@@ -780,15 +786,15 @@ class _PostCardState extends State<_PostCard> {
     );
   }
 
-  static String _timeAgo(DateTime createdAt) {
+  String _timeAgo(DateTime createdAt, AppLocalizations l10n) {
     final now = DateTime.now();
     final diff = now.difference(createdAt);
-    if (diff.inSeconds < 60) return 'Just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} min ago';
-    if (diff.inHours < 24) return '${diff.inHours} hours ago';
-    if (diff.inDays < 7) return '${diff.inDays} days ago';
+    if (diff.inSeconds < 60) return l10n.timeJustNow;
+    if (diff.inMinutes < 60) return l10n.timeMinAgo(diff.inMinutes);
+    if (diff.inHours < 24) return l10n.timeHrAgo(diff.inHours);
+    if (diff.inDays < 7) return l10n.timeDaysAgo(diff.inDays);
     final weeks = (diff.inDays / 7).floor();
-    return '$weeks weeks ago';
+    return l10n.timeWeeksAgo(weeks);
   }
 }
 
@@ -805,6 +811,7 @@ class _ExpandablePostText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final canExpand = text.trim().length > 180;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -824,7 +831,7 @@ class _ExpandablePostText extends StatelessWidget {
             child: InkWell(
               onTap: onToggle,
               child: Text(
-                expanded ? 'Show less' : 'Show more',
+                expanded ? l10n.commShowLess : l10n.commShowMore,
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textPrimary,
                   fontWeight: FontWeight.w700,
@@ -879,6 +886,7 @@ class _PostImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (url.startsWith('data:image/')) {
       final idx = url.indexOf('base64,');
       if (idx == -1) {
@@ -886,7 +894,7 @@ class _PostImage extends StatelessWidget {
           color: AppColors.surfaceMuted,
           alignment: Alignment.center,
           child: Text(
-            'Invalid image',
+            l10n.commInvalidImage,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
             ),
@@ -903,7 +911,7 @@ class _PostImage extends StatelessWidget {
             color: AppColors.surfaceMuted,
             alignment: Alignment.center,
             child: Text(
-              'Cannot load image',
+              l10n.commCannotLoadImage,
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -915,7 +923,7 @@ class _PostImage extends StatelessWidget {
           color: AppColors.surfaceMuted,
           alignment: Alignment.center,
           child: Text(
-            'Cannot load image',
+            l10n.commCannotLoadImage,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
             ),
@@ -930,7 +938,7 @@ class _PostImage extends StatelessWidget {
         color: AppColors.surfaceMuted,
         alignment: Alignment.center,
         child: Text(
-          'Invalid image URL',
+          l10n.commInvalidImageUrl,
           style: AppTextStyles.bodySmall.copyWith(
             color: AppColors.textSecondary,
           ),
@@ -944,7 +952,7 @@ class _PostImage extends StatelessWidget {
         color: AppColors.surfaceMuted,
         alignment: Alignment.center,
         child: Text(
-          'Cannot load image',
+          l10n.commCannotLoadImage,
           style: AppTextStyles.bodySmall.copyWith(
             color: AppColors.textSecondary,
           ),
@@ -971,6 +979,7 @@ class _SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -987,7 +996,7 @@ class _SearchField extends StatelessWidget {
         controller: controller,
         onChanged: onChanged,
         decoration: InputDecoration(
-          hintText: 'Search posts...',
+          hintText: l10n.commSearchHint,
           hintStyle: AppTextStyles.bodySmall.copyWith(
             color: AppColors.textSecondary,
           ),
@@ -1008,17 +1017,17 @@ class _CommunityTabs extends StatelessWidget {
   final int value;
   final ValueChanged<int> onChanged;
 
-  static const _labels = ['All', 'My posts', 'Bookmarks'];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final labels = [l10n.tabAll, l10n.tabMyPosts, l10n.tabBookmarks];
     return Wrap(
       spacing: Spacing.xs,
       runSpacing: Spacing.xs,
-      children: List.generate(_labels.length, (i) {
+      children: List.generate(labels.length, (i) {
         final selected = i == value;
         return ChoiceChip(
-          label: Text(_labels[i]),
+          label: Text(labels[i]),
           selected: selected,
           onSelected: (_) => onChanged(i),
           selectedColor: AppColors.textPrimary,
@@ -1034,92 +1043,6 @@ class _CommunityTabs extends StatelessWidget {
           ),
         );
       }),
-    );
-  }
-}
-
-class _CommunityBottomNavBar extends StatelessWidget {
-  const _CommunityBottomNavBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      notchMargin: 8,
-      color: AppColors.surface,
-      elevation: 0,
-      child: SizedBox(
-        height: Dimensions.bottomNavHeight,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Spacing.lg,
-            vertical: Spacing.xs,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _NavItem(
-                icon: Icons.home_filled,
-                label: 'Home',
-                onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/driver-dashboard',
-                  (route) => route.isFirst,
-                ),
-              ),
-              _NavItem(
-                icon: Icons.directions_car_filled,
-                label: 'Vehicle',
-                onTap: () => Navigator.of(context).pushNamed('/vehicles'),
-              ),
-              _NavItem(
-                icon: Icons.handyman_outlined,
-                label: 'Service',
-                onTap: () => Navigator.of(context).pushNamed('/services'),
-              ),
-              const _NavItem(
-                icon: Icons.people_alt_outlined,
-                label: 'Community',
-                isActive: true,
-              ),
-              _NavItem(
-                icon: Icons.menu_book_outlined,
-                label: 'Education',
-                onTap: () => Navigator.of(context).pushNamed('/education'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    this.isActive = false,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive ? AppColors.textPrimary : AppColors.textSecondary;
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: Spacing.xs),
-          Text(label, style: AppTextStyles.labelSmall.copyWith(color: color)),
-        ],
-      ),
     );
   }
 }

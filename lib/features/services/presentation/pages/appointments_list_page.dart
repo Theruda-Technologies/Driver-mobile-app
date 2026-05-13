@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/border_radius.dart';
-import '../../../../core/constants/dimensions.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_drawer.dart';
+import '../../../../core/widgets/driver_shell_bottom_nav_bar.dart';
+import '../../../../core/widgets/nav_app_bar.dart';
 import '../../../../injection/service_locator.dart';
 import '../../../appointments/domain/entities/appointment.dart';
 import '../../../appointments/presentation/bloc/appointments_bloc.dart';
 import '../../../appointments/presentation/bloc/appointments_event.dart';
 import '../../../appointments/presentation/bloc/appointments_state.dart';
 import '../../domain/entities/service_center.dart';
-import '../../../../core/widgets/nav_app_bar.dart';
 import '../widgets/service_text_formatter.dart';
 
 class AppointmentsListPage extends StatefulWidget {
@@ -36,7 +37,7 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
       child: Scaffold(
         backgroundColor: AppColors.background,
         drawer: const AppDrawer(currentRoute: '/services'),
-        appBar: const NavAppBar(title: 'CarCare', notificationCount: 3),
+        appBar: NavAppBar.mainShell(context),
         body: SafeArea(
           child: BlocBuilder<AppointmentsBloc, AppointmentsState>(
             builder: (context, state) {
@@ -57,10 +58,12 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
                       a.status != AppointmentStatus.completed)
                   .toList();
 
+              final l10n = AppLocalizations.of(context)!;
+
               if (upcoming.isEmpty) {
                 return Center(
                   child: Text(
-                    'No appointments found',
+                    l10n.svcNoAppointmentsFound,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -81,7 +84,7 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Appointments',
+                          l10n.svcApptsListTitle,
                           style: AppTextStyles.headlineSmall.copyWith(
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
@@ -89,7 +92,7 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
                         ),
                         const SizedBox(height: Spacing.xs),
                         Text(
-                          'View and manage your bookings',
+                          l10n.svcApptsListSubtitle,
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textSecondary,
                           ),
@@ -120,7 +123,7 @@ class _AppointmentsListPageState extends State<AppointmentsListPage> {
             },
           ),
         ),
-        bottomNavigationBar: const _ServiceBottomNavBar(),
+        bottomNavigationBar: const DriverShellBottomNavBar(current: DriverShellTab.service),
       ),
     );
   }
@@ -135,23 +138,22 @@ class _AppointmentCardFromEntity extends StatelessWidget {
   final Appointment appointment;
   final List<ServiceCenter> centers;
 
-  String get _garageName {
-    try {
-      return centers.firstWhere((c) => c.id == appointment.garageId).name;
-    } catch (_) {
-      return 'Garage';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final statusLabel = _statusLabel(appointment.status);
+    final l10n = AppLocalizations.of(context)!;
+    String garageNameResolved;
+    try {
+      garageNameResolved = centers.firstWhere((c) => c.id == appointment.garageId).name;
+    } catch (_) {
+      garageNameResolved = l10n.commonGarage;
+    }
+    final statusLabel = _statusLabel(l10n, appointment.status);
     final statusColor = _statusColor(appointment.status);
     final dateStr = _formatDate(appointment.scheduledAt);
     final timeStr = _formatTime(appointment.scheduledAt);
 
-    final garageName = appointment.garageName ?? _garageName;
-    final carName = appointment.vehicleName ?? '—';
+    final garageName = appointment.garageName ?? garageNameResolved;
+    final carName = appointment.vehicleName ?? l10n.commonEmDash;
 
     return Container(
       padding: const EdgeInsets.all(Spacing.md),
@@ -176,7 +178,7 @@ class _AppointmentCardFromEntity extends StatelessWidget {
                 child: Text(
                   appointment.serviceSummary.isNotEmpty
                       ? formatServiceLine(appointment.serviceSummary)
-                      : 'Service',
+                      : l10n.apptServiceDefault,
                   style: AppTextStyles.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -206,14 +208,14 @@ class _AppointmentCardFromEntity extends StatelessWidget {
           ),
           const SizedBox(height: Spacing.xs),
           Text(
-            'Garage: $garageName',
+            l10n.apptGarageLine(garageName),
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: Spacing.xs),
           Text(
-            'Car: $carName',
+            l10n.apptCarLine(carName),
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
             ),
@@ -241,7 +243,7 @@ class _AppointmentCardFromEntity extends StatelessWidget {
                     foregroundColor: AppColors.textOnPrimary,
                     padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
                   ),
-                  child: const Text('Reschedule'),
+                  child: Text(l10n.svcReschedule),
                 ),
               ),
               const SizedBox(width: Spacing.sm),
@@ -253,7 +255,7 @@ class _AppointmentCardFromEntity extends StatelessWidget {
                     side: const BorderSide(color: AppColors.border),
                     padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
                   ),
-                  child: const Text('Cancel'),
+                  child: Text(l10n.svcCancel),
                 ),
               ),
             ],
@@ -296,20 +298,23 @@ class _AppointmentCardFromEntity extends StatelessWidget {
   Future<void> _onCancel(BuildContext context) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Cancel appointment?'),
-        content: const Text('This action cannot be undone.'),
+      builder: (ctx) {
+        final loc = AppLocalizations.of(ctx)!;
+        return AlertDialog(
+        title: Text(loc.apptCancelTitle),
+        content: Text(loc.apptCancelBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('No'),
+            child: Text(loc.commonNo),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Yes', style: TextStyle(color: AppColors.danger)),
+            child: Text(loc.commonYes, style: TextStyle(color: AppColors.danger)),
           ),
         ],
-      ),
+      );
+      },
     );
 
     if (confirm == true && context.mounted) {
@@ -317,20 +322,20 @@ class _AppointmentCardFromEntity extends StatelessWidget {
     }
   }
 
-  String _statusLabel(AppointmentStatus s) {
+  String _statusLabel(AppLocalizations l10n, AppointmentStatus s) {
     switch (s) {
       case AppointmentStatus.pending:
-        return 'Pending';
+        return l10n.apptStatusPending;
       case AppointmentStatus.approved:
-        return 'Confirmed';
+        return l10n.apptStatusConfirmed;
       case AppointmentStatus.rejected:
-        return 'Rejected';
+        return l10n.apptStatusRejected;
       case AppointmentStatus.inService:
-        return 'In Service';
+        return l10n.apptStatusInService;
       case AppointmentStatus.completed:
-        return 'Completed';
+        return l10n.apptStatusCompleted;
       case AppointmentStatus.cancelled:
-        return 'Cancelled';
+        return l10n.apptStatusCancelled;
     }
   }
 
@@ -374,89 +379,3 @@ class _AppointmentCardFromEntity extends StatelessWidget {
     return '${hour.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')} ${am ? 'AM' : 'PM'}';
   }
 }
-
-class _ServiceBottomNavBar extends StatelessWidget {
-  const _ServiceBottomNavBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      notchMargin: 8,
-      color: Colors.white,
-      child: SizedBox(
-        height: Dimensions.bottomNavHeight,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Spacing.lg,
-            vertical: Spacing.xs,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _ServiceBottomNavItem(
-                icon: Icons.home_filled,
-                label: 'Home',
-                onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/driver-dashboard',
-                  (route) => route.isFirst,
-                ),
-              ),
-              _ServiceBottomNavItem(
-                icon: Icons.directions_car_filled,
-                label: 'Vehicles',
-                onTap: () => Navigator.of(context).pushNamed('/vehicles'),
-              ),
-              const _ServiceBottomNavItem(
-                icon: Icons.handyman_outlined,
-                label: 'Service',
-                isActive: true,
-              ),
-              _ServiceBottomNavItem(
-                icon: Icons.people_alt_outlined,
-                label: 'Community',
-                onTap: () => Navigator.of(context).pushNamed('/community'),
-              ),
-              _ServiceBottomNavItem(
-                icon: Icons.menu_book_outlined,
-                label: 'Edu',
-                onTap: () => Navigator.of(context).pushNamed('/education'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ServiceBottomNavItem extends StatelessWidget {
-  const _ServiceBottomNavItem({
-    required this.icon,
-    required this.label,
-    this.isActive = false,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive ? Colors.black : AppColors.textSecondary;
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: Spacing.xs),
-          Text(label, style: AppTextStyles.labelSmall.copyWith(color: color)),
-        ],
-      ),
-    );
-  }
-}
-

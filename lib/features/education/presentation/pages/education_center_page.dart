@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -17,6 +18,23 @@ import '../bloc/education_event.dart';
 import '../bloc/education_state.dart';
 import '../widgets/education_bottom_nav_bar.dart';
 import 'education_article_detail_page.dart';
+
+String _educationTopicTag(AppLocalizations l10n, EducationCategory c) {
+  switch (c) {
+    case EducationCategory.safety:
+      return l10n.eduTopicSafety;
+    case EducationCategory.maintenance:
+      return l10n.eduTopicMaintenance;
+    case EducationCategory.repairs:
+      return l10n.eduTopicRepairs;
+    case EducationCategory.tips:
+      return l10n.eduTopicTips;
+    case EducationCategory.all:
+      return l10n.eduTopicAll;
+    case EducationCategory.manuals:
+      return l10n.eduTopicManuals;
+  }
+}
 
 class EducationCenterPage extends StatefulWidget {
   const EducationCenterPage({super.key});
@@ -49,7 +67,7 @@ class _EducationCenterPageState extends State<EducationCenterPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(currentRoute: '/education'),
-      appBar: const NavAppBar(title: 'CarCare', notificationCount: 3),
+      appBar: NavAppBar.mainShell(context),
       body: SafeArea(
         child: BlocBuilder<EducationBloc, EducationState>(
           builder: (context, state) {
@@ -68,6 +86,7 @@ class _EducationCenterPageState extends State<EducationCenterPage> {
             }
             final articles = state.articles;
             final searchQuery = state.searchQuery;
+            final l10n = AppLocalizations.of(context)!;
 
             return RefreshIndicator(
               onRefresh: () async {
@@ -92,7 +111,7 @@ class _EducationCenterPageState extends State<EducationCenterPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Education Center',
+                            l10n.eduCenterTitle,
                             style: AppTextStyles.headlineSmall.copyWith(
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
@@ -100,7 +119,7 @@ class _EducationCenterPageState extends State<EducationCenterPage> {
                           ),
                           const SizedBox(height: Spacing.xs),
                           Text(
-                            'Learn to maintain your vehicle',
+                            l10n.eduCenterSubtitle,
                             style: AppTextStyles.bodySmall.copyWith(
                               color: AppColors.textSecondary,
                             ),
@@ -110,7 +129,7 @@ class _EducationCenterPageState extends State<EducationCenterPage> {
                             controller: _searchController,
                             onChanged: _scheduleSearch,
                             decoration: InputDecoration(
-                              hintText: 'Search guides and articles...',
+                              hintText: l10n.eduSearchHint,
                               prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
                               filled: true,
                               fillColor: AppColors.surface,
@@ -137,7 +156,7 @@ class _EducationCenterPageState extends State<EducationCenterPage> {
                             Row(
                               children: [
                                 Text(
-                                  'Results for "$searchQuery"',
+                                  l10n.eduResultsFor(searchQuery),
                                   style: AppTextStyles.bodySmall.copyWith(
                                     color: AppColors.textSecondary,
                                   ),
@@ -148,7 +167,7 @@ class _EducationCenterPageState extends State<EducationCenterPage> {
                                     _searchController.clear();
                                     context.read<EducationBloc>().add(const EducationSearchCleared());
                                   },
-                                  child: const Text('Clear'),
+                                  child: Text(AppLocalizations.of(context)!.eduClear),
                                 ),
                               ],
                             ),
@@ -168,7 +187,7 @@ class _EducationCenterPageState extends State<EducationCenterPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Featured Articles',
+                                l10n.eduFeaturedArticles,
                                 style: AppTextStyles.titleMedium.copyWith(
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
@@ -178,7 +197,7 @@ class _EducationCenterPageState extends State<EducationCenterPage> {
                                 onPressed: () {
                                   Navigator.of(context).pushNamed('/education/all');
                                 },
-                                child: const Text('View All'),
+                                child: Text(AppLocalizations.of(context)!.eduViewAll),
                               ),
                             ],
                           ),
@@ -194,8 +213,8 @@ class _EducationCenterPageState extends State<EducationCenterPage> {
                         child: Center(
                           child: Text(
                             searchQuery != null && searchQuery.isNotEmpty
-                                ? 'No articles match your search.'
-                                : 'No articles yet. Check back soon.',
+                                ? l10n.eduNoArticlesMatchSearch
+                                : l10n.eduNoArticlesYet,
                             textAlign: TextAlign.center,
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: AppColors.textSecondary,
@@ -261,12 +280,13 @@ class _CategoryGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final tiles = [
-      _CatData(EducationCategory.repairs, 'Repair', _count(EducationCategory.repairs), Icons.build_rounded, const Color(0xFF2E7D32)),
-      _CatData(EducationCategory.safety, 'Safety', _count(EducationCategory.safety), Icons.shield_outlined, const Color(0xFFC62828)),
-      _CatData(EducationCategory.maintenance, 'Maintenance', _count(EducationCategory.maintenance), Icons.schedule_rounded, const Color(0xFFF9A825)),
-      _CatData(EducationCategory.tips, 'Tips', _count(EducationCategory.tips), Icons.lightbulb_outline_rounded, const Color(0xFF0277BD)),
-      _CatData(EducationCategory.manuals, 'Manuals', _count(EducationCategory.manuals), Icons.menu_book_rounded, const Color(0xFF6A1B9A)),
+      _CatData(EducationCategory.repairs, l10n.eduCatRepairs, _count(EducationCategory.repairs), Icons.build_rounded, const Color(0xFF2E7D32)),
+      _CatData(EducationCategory.safety, l10n.eduCatSafety, _count(EducationCategory.safety), Icons.shield_outlined, const Color(0xFFC62828)),
+      _CatData(EducationCategory.maintenance, l10n.eduCatMaintenance, _count(EducationCategory.maintenance), Icons.schedule_rounded, const Color(0xFFF9A825)),
+      _CatData(EducationCategory.tips, l10n.eduCatTips, _count(EducationCategory.tips), Icons.lightbulb_outline_rounded, const Color(0xFF0277BD)),
+      _CatData(EducationCategory.manuals, l10n.eduCatManuals, _count(EducationCategory.manuals), Icons.menu_book_rounded, const Color(0xFF6A1B9A)),
     ];
     return GridView.count(
       crossAxisCount: 2,
@@ -304,6 +324,7 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(BorderRadiusValues.xl),
@@ -331,7 +352,7 @@ class _CategoryCard extends StatelessWidget {
               ),
               const SizedBox(height: Spacing.xs),
               Text(
-                '${data.count} articles',
+                l10n.eduCategoryArticleCount(data.count),
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -355,7 +376,12 @@ class _FeaturedArticleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final beginner = article.difficultyLabel == 'Beginner';
+    final l10n = AppLocalizations.of(context)!;
+    final isIntermediate = article.category == EducationCategory.repairs;
+    final difficultyLabel = isIntermediate
+        ? l10n.eduDifficultyIntermediate
+        : l10n.eduDifficultyBeginner;
+    final beginner = !isIntermediate;
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(BorderRadiusValues.xl),
@@ -387,7 +413,7 @@ class _FeaturedArticleCard extends StatelessWidget {
               ),
               const SizedBox(height: Spacing.xs),
               Text(
-                '${article.topicTag} • ${article.estimatedReadMinutes} min',
+                '${_educationTopicTag(l10n, article.category)} • ${l10n.eduReadMinutes(article.estimatedReadMinutes)}',
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -404,7 +430,7 @@ class _FeaturedArticleCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(BorderRadiusValues.sm),
                     ),
                     child: Text(
-                      article.difficultyLabel,
+                      difficultyLabel,
                       style: AppTextStyles.labelSmall.copyWith(
                         color: beginner ? AppColors.success : const Color(0xFFF57F17),
                         fontWeight: FontWeight.w600,
@@ -413,7 +439,7 @@ class _FeaturedArticleCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   Text(
-                    'Read ›',
+                    l10n.eduReadMore,
                     style: AppTextStyles.labelMedium.copyWith(
                       color: AppColors.secondary,
                       fontWeight: FontWeight.w600,
@@ -447,7 +473,7 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: Spacing.md),
             FilledButton(
               onPressed: onRetry,
-              child: const Text('Retry'),
+              child: Text(AppLocalizations.of(context)!.eduRetry),
             ),
           ],
         ),

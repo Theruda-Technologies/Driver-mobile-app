@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -17,43 +18,37 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final _pages = const [
-    _OnboardingContent(
-      imageAsset: 'assets/images/onboarding_car_health.png',
-      title: "Know Your Car's Health",
-      body:
-          'Track your vehicle details, maintenance status, and upcoming services all in one place — no more guesswork.',
-    ),
-    _OnboardingContent(
-      imageAsset: 'assets/images/onboarding_maintenance.png',
-      title: 'Never Miss Maintenance',
-      body:
-          'Get timely reminders for oil changes, tire checks, and services so your car stays reliable and safe.',
-    ),
-    _OnboardingContent(
-      imageAsset: 'assets/images/onboarding_help.png',
-      title: 'Find Help When You Need It',
-      body:
-          'Locate nearby garages, book services, or request onsite assistance anytime, anywhere.',
-    ),
-    _OnboardingContent(
-      imageAsset: 'assets/images/onboarding_ai_assistant.png',
-      title: 'Ask Your AI Car Assistant',
-      body:
-          'Chat with an AI assistant for instant help, maintenance tips, and answers about your vehicle.',
-    ),
-    _OnboardingContent(
-      imageAsset: 'assets/images/onboarding_learn_share.png',
-      title: 'Learn. Share. Drive Better.',
-      body:
-          'Explore car care guides and connect with other drivers to share experiences and advice.',
-    ),
-    _OnboardingContent(
-      title: 'Ready to Drive Smarter?',
-      body:
-          'Join thousands of drivers who trust us to keep their vehicles in perfect condition.',
-    ),
-  ];
+  List<_OnboardingContent> _pages(AppLocalizations l10n) => [
+        _OnboardingContent(
+          imageAsset: 'assets/images/onboarding_car_health.png',
+          title: l10n.onbTitle1,
+          body: l10n.onbBody1,
+        ),
+        _OnboardingContent(
+          imageAsset: 'assets/images/onboarding_maintenance.png',
+          title: l10n.onbTitle2,
+          body: l10n.onbBody2,
+        ),
+        _OnboardingContent(
+          imageAsset: 'assets/images/onboarding_help.png',
+          title: l10n.onbTitle3,
+          body: l10n.onbBody3,
+        ),
+        _OnboardingContent(
+          imageAsset: 'assets/images/onboarding_ai_assistant.png',
+          title: l10n.onbTitle4,
+          body: l10n.onbBody4,
+        ),
+        _OnboardingContent(
+          imageAsset: 'assets/images/onboarding_learn_share.png',
+          title: l10n.onbTitle5,
+          body: l10n.onbBody5,
+        ),
+        _OnboardingContent(
+          title: l10n.onbTitle6,
+          body: l10n.onbBody6,
+        ),
+      ];
 
   Future<void> _setCompletedAndContinue() async {
     final prefs = await SharedPreferences.getInstance();
@@ -67,7 +62,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 
   void _onNext() {
-    if (_currentPage == _pages.length - 1) {
+    final pages = _pages(AppLocalizations.of(context)!);
+    if (_currentPage == pages.length - 1) {
       _setCompletedAndContinue();
     } else {
       _pageController.nextPage(
@@ -83,7 +79,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isLast = _currentPage == _pages.length - 1;
+    final l10n = AppLocalizations.of(context)!;
+    final pages = _pages(l10n);
+    final isLast = _currentPage == pages.length - 1;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -94,12 +92,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Row(
                 children: [
-                  _PageDots(count: _pages.length, index: _currentPage),
+                  _PageDots(count: pages.length, index: _currentPage),
                   const Spacer(),
                   TextButton(
                     onPressed: _onSkip,
                     child: Text(
-                      'Skip',
+                      l10n.onbSkip,
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -111,12 +109,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 onPageChanged: (index) {
                   setState(() => _currentPage = index);
                 },
                 itemBuilder: (context, index) {
-                  final page = _pages[index];
+                  final page = pages[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: Column(
@@ -168,7 +166,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     ),
                   ),
                   onPressed: _onNext,
-                  child: Text(isLast ? 'Get Started' : 'Continue'),
+                  child: Text(isLast ? l10n.onbGetStarted : l10n.commonContinue),
                 ),
               ),
             ),

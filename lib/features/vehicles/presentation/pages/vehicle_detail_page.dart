@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/border_radius.dart';
+import '../../../../core/widgets/driver_shell_bottom_nav_bar.dart';
 import '../../../../core/constants/dimensions.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/router/route_names.dart';
@@ -45,10 +47,11 @@ class _VehicleDetailView extends StatelessWidget {
       listenWhen: (prev, curr) => curr is VehicleDeleted || curr is VehiclesFailure,
       listener: (context, state) {
         if (state is VehicleDeleted) {
+          final l10n = AppLocalizations.of(context)!;
           Navigator.of(context).pop(true);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Vehicle removed.'),
+            SnackBar(
+              content: Text(l10n.vehDetailRemoved),
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
             ),
@@ -66,9 +69,10 @@ class _VehicleDetailView extends StatelessWidget {
         ),
         title: BlocBuilder<VehiclesBloc, VehiclesState>(
           builder: (context, state) {
+            final l10n = AppLocalizations.of(context)!;
             if (state is! VehicleDetailLoaded) {
               return Text(
-                'Vehicle Details',
+                l10n.vehDetailTitle,
                 style: AppTextStyles.titleMedium.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -104,6 +108,7 @@ class _VehicleDetailView extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is VehiclesFailure) {
+            final l10n = AppLocalizations.of(context)!;
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(Spacing.lg),
@@ -116,7 +121,7 @@ class _VehicleDetailView extends StatelessWidget {
                     const SizedBox(height: Spacing.lg),
                     TextButton(
                       onPressed: () => context.read<VehiclesBloc>().add(VehicleDetailRequested(vehicleId)),
-                      child: const Text('Retry'),
+                      child: Text(l10n.commonRetry),
                     ),
                   ],
                 ),
@@ -126,6 +131,7 @@ class _VehicleDetailView extends StatelessWidget {
           if (state is! VehicleDetailLoaded) {
             return const SizedBox.shrink();
           }
+          final l10n = AppLocalizations.of(context)!;
           final vehicle = state.vehicle;
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: Spacing.lg),
@@ -146,7 +152,7 @@ class _VehicleDetailView extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.chat_bubble_outline, size: 20),
-                    label: const Text('Ask AI assistant'),
+                    label: Text(l10n.vehDetailAskAi),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.secondary,
                       side: const BorderSide(color: AppColors.secondary),
@@ -177,7 +183,7 @@ class _VehicleDetailView extends StatelessWidget {
                       }
                     },
                     icon: const Icon(Icons.edit_outlined, size: 20),
-                    label: const Text('Edit Vehicle'),
+                    label: Text(l10n.vehDetailEditVehicle),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.secondary,
                       foregroundColor: AppColors.textOnPrimary,
@@ -191,7 +197,7 @@ class _VehicleDetailView extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () => _confirmRemove(context, vehicle),
                     icon: const Icon(Icons.delete_outline, size: 20),
-                    label: const Text('Remove Vehicle'),
+                    label: Text(l10n.vehDetailRemoveVehicle),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.danger,
                       foregroundColor: Colors.white,
@@ -205,30 +211,33 @@ class _VehicleDetailView extends StatelessWidget {
           );
         },
       ),
-      bottomNavigationBar: _VehicleDetailBottomNav(),
+      bottomNavigationBar: const DriverShellBottomNavBar(current: DriverShellTab.vehicles),
     ),
     );
   }
 
   Future<void> _confirmRemove(BuildContext context, Vehicle vehicle) async {
+    final display =
+        vehicle.displayName.trim().isNotEmpty ? vehicle.displayName.trim() : vehicle.plateNumber;
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Remove vehicle?'),
-        content: Text(
-          '${vehicle.displayName} will be removed. This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Remove', style: TextStyle(color: AppColors.danger)),
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        final dL10n = AppLocalizations.of(ctx)!;
+        return AlertDialog(
+          title: Text(dL10n.vehDetailRemoveTitle),
+          content: Text(dL10n.vehDetailRemoveConfirmBody(display)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(dL10n.commonCancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(dL10n.commonRemove, style: TextStyle(color: AppColors.danger)),
+            ),
+          ],
+        );
+      },
     );
     if (confirm == true && context.mounted) {
       context.read<VehiclesBloc>().add(VehicleDeleteRequested(vehicle.id));
@@ -307,6 +316,7 @@ class _OverallHealthCardState extends State<_OverallHealthCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_loading) {
       return const Center(child: Padding(padding: EdgeInsets.all(Spacing.lg), child: CircularProgressIndicator()));
     }
@@ -325,15 +335,15 @@ class _OverallHealthCardState extends State<_OverallHealthCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Overall health unavailable',
+              l10n.vehDetailHealthUnavailable,
               style: AppTextStyles.titleSmall.copyWith(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
             ),
             const SizedBox(height: Spacing.xs),
             Text(
-              'Pull to refresh or try again.',
+              l10n.vehDetailHealthRetryHint,
               style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
             ),
-            TextButton(onPressed: _load, child: const Text('Retry')),
+            TextButton(onPressed: _load, child: Text(l10n.commonRetry)),
           ],
         ),
       );
@@ -350,7 +360,7 @@ class _OverallHealthCardState extends State<_OverallHealthCard> {
           color: color,
           subtitle: (h.summary != null && h.summary!.trim().isNotEmpty)
               ? h.summary!.trim()
-              : 'From your maintenance and garage data.',
+              : l10n.dashHealthScoresFallback,
         ),
         if (subsystems.isNotEmpty) ...[
           const SizedBox(height: Spacing.md),
@@ -392,7 +402,7 @@ class _OverallHealthCardBody extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Overall car health',
+                  AppLocalizations.of(context)!.dashOverallCarHealthTitle,
                   style: AppTextStyles.titleSmall.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -441,7 +451,10 @@ class _VehicleInformationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mileageStr = vehicle.mileage != null ? '${_formatMileage(vehicle.mileage!)} miles' : '—';
+    final l10n = AppLocalizations.of(context)!;
+    final mileageStr = vehicle.mileage != null
+        ? '${_formatMileage(vehicle.mileage!)} ${l10n.commonMilesUnit}'
+        : l10n.commonEmDash;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(Spacing.md),
@@ -456,18 +469,18 @@ class _VehicleInformationCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Vehicle Information',
+            l10n.vehDetailVehicleInformation,
             style: AppTextStyles.titleSmall.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: Spacing.md),
-          _InfoRow(icon: Icons.directions_car_outlined, label: 'Make & Model', value: '${vehicle.make} ${vehicle.model}'),
-          _InfoRow(icon: Icons.calendar_today_outlined, label: 'Year', value: vehicle.year.toString()),
-          _InfoRow(icon: Icons.description_outlined, label: 'VIN', value: vehicle.vin ?? '—'),
-          _InfoRow(icon: Icons.speed_outlined, label: 'Mileage', value: mileageStr),
-          _InfoRow(icon: Icons.local_gas_station_outlined, label: 'Fuel Type', value: vehicle.fuelType ?? '—'),
+          _InfoRow(icon: Icons.directions_car_outlined, label: l10n.vehDetailMakeModel, value: '${vehicle.make} ${vehicle.model}'),
+          _InfoRow(icon: Icons.calendar_today_outlined, label: l10n.vehDetailYear, value: vehicle.year.toString()),
+          _InfoRow(icon: Icons.description_outlined, label: l10n.vehDetailVin, value: vehicle.vin ?? l10n.commonEmDash),
+          _InfoRow(icon: Icons.speed_outlined, label: l10n.vehDetailMileage, value: mileageStr),
+          _InfoRow(icon: Icons.local_gas_station_outlined, label: l10n.vehDetailFuelType, value: vehicle.fuelType ?? l10n.commonEmDash),
         ],
       ),
     );
@@ -530,12 +543,13 @@ class _DocumentsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final insuranceText = insuranceExpiresAt != null
-        ? 'Active - Expires ${_formatDate(insuranceExpiresAt!)}'
-        : '—';
+        ? l10n.vehDetailInsuranceActiveExpires(_formatDate(insuranceExpiresAt!))
+        : l10n.commonEmDash;
     final registrationText = registrationExpiresAt != null
-        ? 'Valid - Expires ${_formatDate(registrationExpiresAt!)}'
-        : '—';
+        ? l10n.vehDetailRegistrationValidExpires(_formatDate(registrationExpiresAt!))
+        : l10n.commonEmDash;
 
     final hasInsuranceDoc = (insuranceDocumentUrl ?? '').trim().isNotEmpty;
     final hasRegistrationDoc = (registrationDocumentUrl ?? '').trim().isNotEmpty;
@@ -555,7 +569,7 @@ class _DocumentsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Documents',
+            l10n.vehDetailDocumentsSection,
             style: AppTextStyles.titleSmall.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -570,7 +584,7 @@ class _DocumentsCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Insurance', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                    Text(l10n.vehDetailInsurance, style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
                     Text(insuranceText, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary)),
                   ],
                 ),
@@ -586,7 +600,7 @@ class _DocumentsCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Registration', style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
+                    Text(l10n.vehDetailRegistration, style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary)),
                     Text(registrationText, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary)),
                   ],
                 ),
@@ -606,7 +620,7 @@ class _DocumentsCard extends StatelessWidget {
                       )
                   : null,
               icon: const Icon(Icons.folder_open_outlined, size: 18),
-              label: const Text('View Documents'),
+              label: Text(l10n.vehDetailViewDocuments),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.secondary,
                 side: const BorderSide(color: AppColors.secondary),
@@ -628,6 +642,7 @@ class _DocumentsCard extends StatelessWidget {
       context: context,
       showDragHandle: true,
       builder: (ctx) {
+        final sheetL10n = AppLocalizations.of(ctx)!;
         Future<void> open(String url) async {
           final uri = Uri.tryParse(url);
           if (uri == null) return;
@@ -643,7 +658,7 @@ class _DocumentsCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Documents',
+                  sheetL10n.vehDetailDocumentsSection,
                   style: AppTextStyles.titleMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -654,7 +669,7 @@ class _DocumentsCard extends StatelessWidget {
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.shield_outlined),
-                    title: const Text('Insurance Document'),
+                    title: Text(sheetL10n.vehDetailInsuranceDoc),
                     subtitle: Text(
                       insuranceUrl,
                       maxLines: 1,
@@ -668,7 +683,7 @@ class _DocumentsCard extends StatelessWidget {
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.description_outlined),
-                    title: const Text('Registration Document'),
+                    title: Text(sheetL10n.vehDetailRegistrationDoc),
                     subtitle: Text(
                       registrationUrl,
                       maxLines: 1,
@@ -680,7 +695,7 @@ class _DocumentsCard extends StatelessWidget {
                   ),
                 if (insuranceUrl == null && registrationUrl == null)
                   Text(
-                    'No documents available.',
+                    sheetL10n.vehDetailNoDocumentsAvailable,
                     style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                   ),
               ],
@@ -688,70 +703,6 @@ class _DocumentsCard extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class _VehicleDetailBottomNav extends StatelessWidget {
-  const _VehicleDetailBottomNav();
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      notchMargin: 8,
-      color: AppColors.surface,
-      elevation: 0,
-      child: SizedBox(
-        height: Dimensions.bottomNavHeight,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Spacing.lg, vertical: Spacing.xs),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _NavItem(icon: Icons.home_filled, label: 'Home', onTap: () => Navigator.of(context).pushNamedAndRemoveUntil('/driver-dashboard', (r) => r.isFirst)),
-              _NavItem(icon: Icons.directions_car_filled, label: 'Vehicle', isActive: true),
-              _NavItem(icon: Icons.build_outlined, label: 'Service', onTap: () => Navigator.of(context).pushNamed('/services')),
-              _NavItem(icon: Icons.people_alt_outlined, label: 'Community', onTap: () => Navigator.of(context).pushNamed('/community')),
-              _NavItem(
-                icon: Icons.menu_book_outlined,
-                label: 'Education',
-                onTap: () => Navigator.of(context).pushNamed('/education'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    this.isActive = false,
-    this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive ? AppColors.textPrimary : AppColors.textSecondary;
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: Spacing.xs),
-          Text(label, style: AppTextStyles.labelSmall.copyWith(color: color)),
-        ],
-      ),
     );
   }
 }

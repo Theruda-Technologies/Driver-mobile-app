@@ -3,12 +3,14 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/dimensions.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_drawer.dart';
+import '../../../../core/widgets/driver_shell_bottom_nav_bar.dart';
 import '../../../../core/widgets/nav_app_bar.dart';
 import '../../../../injection/service_locator.dart';
 import '../../../maintenance/domain/entities/maintenance_upcoming.dart';
@@ -78,10 +80,11 @@ class _VehiclesHubViewState extends State<_VehiclesHubView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(currentRoute: '/vehicles'),
-      appBar: const NavAppBar(title: 'CarCare', notificationCount: 3),
+      appBar: NavAppBar.mainShell(context),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -102,10 +105,10 @@ class _VehiclesHubViewState extends State<_VehiclesHubView> {
                       children: [
                         Text(
                           _tab == 1
-                              ? 'Upcoming Maintenance'
+                              ? l10n.vehListTitleUpcoming
                               : _tab == 2
-                                  ? 'Maintenance History'
-                                  : 'My Vehicles',
+                                  ? l10n.vehListTitleHistory
+                                  : l10n.vehListTitleMyVehicles,
                           style: AppTextStyles.headlineSmall.copyWith(
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
@@ -114,10 +117,10 @@ class _VehiclesHubViewState extends State<_VehiclesHubView> {
                         const SizedBox(height: 4),
                         Text(
                           _tab == 1
-                              ? 'Scheduled and recommended services'
+                              ? l10n.vehListSubtitleUpcoming
                               : _tab == 2
-                                  ? 'Scheduled reminders and completed services'
-                                  : 'Manage your vehicles and maintenance',
+                                  ? l10n.vehListSubtitleHistory
+                                  : l10n.vehListSubtitleMyVehicles,
                           style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
                         ),
                       ],
@@ -148,7 +151,7 @@ class _VehiclesHubViewState extends State<_VehiclesHubView> {
           ),
         ),
       ),
-      bottomNavigationBar: const _VehiclesListBottomNavBar(),
+      bottomNavigationBar: const DriverShellBottomNavBar(current: DriverShellTab.vehicles),
     );
   }
 }
@@ -160,6 +163,7 @@ class _SegmentTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -171,7 +175,7 @@ class _SegmentTabs extends StatelessWidget {
         children: [
           Expanded(
             child: _TabPill(
-              label: 'My Vehicles',
+              label: l10n.vehSegmentMyVehicles,
               selected: value == 0,
               onTap: () => onChanged(0),
             ),
@@ -179,7 +183,7 @@ class _SegmentTabs extends StatelessWidget {
           const SizedBox(width: 6),
           Expanded(
             child: _TabPill(
-              label: 'Upcoming',
+              label: l10n.vehSegmentUpcoming,
               selected: value == 1,
               onTap: () => onChanged(1),
             ),
@@ -187,7 +191,7 @@ class _SegmentTabs extends StatelessWidget {
           const SizedBox(width: 6),
           Expanded(
             child: _TabPill(
-              label: 'History',
+              label: l10n.vehSegmentHistory,
               selected: value == 2,
               onTap: () => onChanged(2),
             ),
@@ -266,7 +270,7 @@ class _VehiclesTab extends StatelessWidget {
                   TextButton(
                     onPressed: () => context.read<VehiclesBloc>().add(const VehiclesLoadRequested()),
                     child: Text(
-                      'Retry',
+                      AppLocalizations.of(context)!.commonRetry,
                       style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
                     ),
                   ),
@@ -316,6 +320,7 @@ class _AddNewVehicleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(22),
@@ -347,7 +352,7 @@ class _AddNewVehicleCard extends StatelessWidget {
             ),
             const SizedBox(height: Spacing.md),
             Text(
-              'Add New Vehicle',
+              l10n.vehFabAddNewVehicle,
               style: AppTextStyles.titleMedium.copyWith(
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -355,7 +360,7 @@ class _AddNewVehicleCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Register another car',
+              l10n.vehFabRegisterAnother,
               style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
             ),
           ],
@@ -476,7 +481,7 @@ class _UpcomingMaintenanceTabState extends State<_UpcomingMaintenanceTab> {
                   );
                 },
                 icon: const Icon(Icons.calendar_today_outlined),
-                label: const Text('Schedule Maintenance'),
+                label: Text(AppLocalizations.of(context)!.vehScheduleMaintenance),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.textPrimary,
                   foregroundColor: Colors.white,
@@ -521,9 +526,7 @@ class _MaintenanceHistoryTab extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: Spacing.md),
                       child: Text(
-                        'Nothing here yet.\n\n'
-                        'Scheduled reminders and completed services show here with status '
-                        '(Good, Soon, Overdue, Done). Use Upcoming to schedule maintenance or mark it done.',
+                        AppLocalizations.of(context)!.vehHistoryEmpty,
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                       ),
@@ -555,9 +558,10 @@ class _VehicleListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isActive = vehicle.status != VehicleStatus.pending;
     final statusColor = isActive ? AppColors.success : AppColors.pending;
-    final statusText = isActive ? 'Good' : 'Attention';
+    final statusText = isActive ? l10n.vehCardStatusGood : l10n.vehCardStatusAttention;
 
     return InkWell(
       onTap: onTap,
@@ -628,91 +632,3 @@ class _VehicleListCard extends StatelessWidget {
   }
 }
 
-class _VehiclesListBottomNavBar extends StatelessWidget {
-  const _VehiclesListBottomNavBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      notchMargin: 8,
-      color: AppColors.surface,
-      elevation: 0,
-      child: SizedBox(
-        height: Dimensions.bottomNavHeight,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Spacing.lg,
-            vertical: Spacing.xs,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _VehiclesListBottomNavItem(
-                icon: Icons.home_filled,
-                label: 'Home',
-                onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/driver-dashboard',
-                  (route) => route.isFirst,
-                ),
-              ),
-              _VehiclesListBottomNavItem(
-                icon: Icons.directions_car_filled,
-                label: 'Vehicles',
-                isActive: true,
-                onTap: () {},
-              ),
-              _VehiclesListBottomNavItem(
-                icon: Icons.handyman_outlined,
-                label: 'Service',
-                onTap: () => Navigator.of(context).pushNamed('/services'),
-              ),
-              _VehiclesListBottomNavItem(
-                icon: Icons.people_alt_outlined,
-                label: 'Community',
-                onTap: () => Navigator.of(context).pushNamed('/community'),
-              ),
-              _VehiclesListBottomNavItem(
-                icon: Icons.menu_book_outlined,
-                label: 'Edu',
-                onTap: () => Navigator.of(context).pushNamed('/education'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _VehiclesListBottomNavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback? onTap;
-
-  const _VehiclesListBottomNavItem({
-    required this.icon,
-    required this.label,
-    this.isActive = false,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive ? AppColors.textPrimary : AppColors.textSecondary;
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: Spacing.xs),
-          Text(label, style: AppTextStyles.labelSmall.copyWith(color: color)),
-        ],
-      ),
-    );
-  }
-}
-
-// (old empty vehicles card removed; new design uses _AddNewVehicleCard)

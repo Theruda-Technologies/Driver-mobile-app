@@ -214,6 +214,14 @@ class _AiChatViewState extends State<_AiChatView> {
           ).showSnackBar(SnackBar(content: Text(err)));
         }
       },
+      buildWhen: (prev, curr) =>
+          prev.currentSessionId != curr.currentSessionId ||
+          prev.messagesLoading != curr.messagesLoading ||
+          prev.loadingOlder != curr.loadingOlder ||
+          prev.hasMore != curr.hasMore ||
+          prev.sending != curr.sending ||
+          prev.messages.length != curr.messages.length ||
+          prev.error != curr.error,
       builder: (context, state) {
         final vehiclesState = context.watch<VehiclesBloc>().state;
         final vehicles = vehiclesState is VehiclesLoaded
@@ -402,6 +410,16 @@ class _AiChatViewState extends State<_AiChatView> {
 String _assistantMarkdownData(String raw) {
   var t = raw.replaceAll('\r\n', '\n').trim();
   if (t.isEmpty) return t;
+  // Some AI backends prepend structured headers like "Quick answer".
+  // Strip that redundant header so replies read naturally in-chat.
+  t = t.replaceFirst(
+    RegExp(r'^(#{1,3}\s*)?quick answer\s*\n+', caseSensitive: false),
+    '',
+  );
+  t = t.replaceFirst(
+    RegExp(r'^\*\*quick answer\*\*\s*\n+', caseSensitive: false),
+    '',
+  );
   // Convert inline "1. ... 2. ..." into proper numbered list lines.
   t = t.replaceAllMapped(RegExp(r'(?<=[^\n])\s+(?=\d+\.\s)'), (_) => '\n');
   // Convert inline "- ..." blocks into real markdown bullet lines.
@@ -535,7 +553,7 @@ class _MessageBubble extends StatelessWidget {
                   ),
                   const SizedBox(height: Spacing.sm),
                   MarkdownBody(
-                    data: _assistantMarkdownData(message.content),
+                    data: _assistantMarkdownCached(message),
                     selectable: true,
                     styleSheet: _markdownStyleSheet(context, baseStyle),
                   ),
@@ -544,4 +562,22 @@ class _MessageBubble extends StatelessWidget {
       ),
     );
   }
+}
+
+// Cache assistant markdown formatting to avoid re-running regex transforms on
+// every rebuild (Markdown parsing is relatively expensive on large threads).
+final Map<String, String> _assistantMarkdownCache = <String, String>{};
+
+String _assistantMarkdownCached(AiMessageModel message) {
+  if (message.isUser) return message.content;
+  final key = '${message.id}::${message.content.hashCode}';
+  final cached = _assistantMarkdownCache[key];
+  if (cached != null) return cached;
+  final value = _assistantMarkdownData(message.content);
+  // Keep cache bounded to avoid unbounded growth.
+  if (_assistantMarkdownCache.length > 400) {
+    _assistantMarkdownCache.clear();
+  }
+  _assistantMarkdownCache[key] = value;
+  return value;
 }

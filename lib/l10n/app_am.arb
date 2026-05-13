@@ -1,0 +1,557 @@
+{
+  "@@locale": "am",
+  "appTitle": "የአሽከርካሪ እገዛ",
+  "loginPhoneInvalidSnackbar": "ትክክለኛ ስልክ ያስገቡ፦ 09…፣ 251… ወይም +251… (9 አኃዝ ሞባይል)።",
+  "loginWelcomeTitle": "እንኳን ደህና መጡ",
+  "loginWelcomeSubtitle": "ወደ መለያዎ ለመቀጠል ይግቡ",
+  "loginPhoneLabel": "ስልክ ቁጥር",
+  "loginPhoneHint": "09…፣ 251… ወይም +251…",
+  "loginPasswordLabel": "የይለፍ ቃል",
+  "loginPasswordHint": "የይለፍ ቃልዎን ያስገቡ",
+  "loginButton": "ግባ",
+  "loginNoAccountPrompt": "መለያ የለዎትም? ",
+  "loginCreateAccount": "መለያ ይፍጠሩ",
+  "signupEnterValidPhoneOtp": "ኦቲፒ ከመጠየቅዎ በፊት ትክክለኛ ስልክ ያስገቡ።",
+  "signupPhoneVerifiedAutomatic": "ስልክ ቁጥር በራስ-ሰር ተረጋግጧል።",
+  "signupFailedSendOtp": "ኦቲፒ መላክ አልተሳካም።",
+  "signupOtpSentCheckSms": "ኦቲፒ ተልኳል። ኤስኤምኤስዎን ይመልከቱ።",
+  "signupOtpSetupFailed": "የኦቲፒ ማዋቀር አልተሳካም፦ {error}",
+  "signupRequestOtpFirst": "መጀመሪያ ኦቲፒ ይጠይቁ።",
+  "signupEnterValidPhone": "ትክክለኛ ስልክ ቁጥር ያስገቡ።",
+  "signupEnterSixDigitOtp": "የ6 አኃዝ ኦቲፒ ኮድ ያስገቡ።",
+  "signupPasswordsMismatch": "የይለፍ ቃሎች አይጣጣሙም",
+  "signupPasswordMin8": "የይለፍ ቃል ቢያንስ 8 ቁምፊዎች መሆን አለበት",
+  "signupPhoneInvalidSnackbar": "ትክክለኛ ስልክ ያስገቡ፦ 09…፣ 251… ወይም +251… (9 አኃዝ ሞባይል)።",
+  "signupVerifyPhoneBeforeSignup": "ከመመዝገብዎ በፊት ስልክዎን በኦቲፒ ያረጋግጡ።",
+  "signupFirebaseTokenMissing": "ስልክ ተረጋግጧል፣ ነገር ግን የፋየርቤዝ ቶከን የለም። ኦቲፒ እንደገና ያረጋግጡ።",
+  "signupTitle": "መለያ ይፍጠሩ",
+  "signupSubtitle": "ከካርኬር ጋር ለመጀመር ይመዝገቡ",
+  "signupFirstName": "የመጀመሪያ ስም",
+  "signupLastName": "የአባት ስም",
+  "signupHintFirstName": "ጆን",
+  "signupHintLastName": "ዶ",
+  "signupEmail": "ኢሜይል",
+  "signupEmailHint": "you@example.com",
+  "signupPhoneLabel": "ስልክ ቁጥር",
+  "signupPhoneHint": "09…፣ 251… ወይም +251…",
+  "signupSendOtp": "ኦቲፒ ላክ",
+  "signupResendOtp": "ኦቲፒ እንደገና ላክ",
+  "signupOtpCodeLabel": "የኦቲፒ ኮድ",
+  "signupOtpHint": "የ6 አኃዝ ኮድ ያስገቡ",
+  "signupVerify": "አረጋግጥ",
+  "signupVerified": "ተረጋግጧል",
+  "signupPasswordLabel": "የይለፍ ቃል",
+  "signupPasswordHint": "ቢያንስ 8 ቁምፊዎች",
+  "signupConfirmPasswordLabel": "የይለፍ ቃል ያረጋግጡ",
+  "signupConfirmPasswordHint": "የይለፍ ቃልዎን እንደገና ያስገቡ",
+  "signupCreateButton": "መለያ ይፍጠሩ",
+  "signupOtpVerifiedSuccess": "ኦቲፒ በተሳካ ሁኔታ ተረጋግጧል።",
+  "signupInvalidOtp": "የማይሰራ የኦቲፒ ኮድ።",
+  "settingsTitle": "ቅንብሮች",
+  "settingsLanguageSection": "ቋንቋ",
+  "settingsLanguageEnglish": "እንግሊዝኛ",
+  "settingsLanguageAmharic": "አማርኛ",
+  "settingsChangePasswordTitle": "የይለፍ ቃል ለውጥ",
+  "settingsChangePasswordSubtitle": "አዲስ የይለፍ ቃል ለመግባት የአሁኑን ይጠቀሙ።",
+  "settingsCurrentPasswordLabel": "የአሁን የይለፍ ቃል",
+  "settingsNewPasswordLabel": "አዲስ የይለፍ ቃል",
+  "settingsConfirmNewPasswordLabel": "አዲሱን የይለፍ ቃል ያረጋግጡ",
+  "settingsPasswordChanged": "የይለፍ ቃል በተሳካ ሁኔታ ተቀይሯል",
+  "settingsRequestFailed": "ጥያቄ አልተሳካም",
+  "settingsUnableChangePassword": "የይለፍ ቃል አሁን ለውጥ አልተቻለም።",
+  "settingsValidatorCurrentRequired": "የአሁን የይለፍ ቃል ያስፈልጋል",
+  "settingsValidatorNewRequired": "አዲስ የይለፍ ቃል ያስፈልጋል",
+  "settingsValidatorNewMin6": "የይለፍ ቃል ቢያንስ 6 ቁምፊዎች መሆን አለበት",
+  "settingsValidatorNewDifferent": "አዲሱ የይለፍ ቃል የተለየ መሆን አለበት",
+  "settingsValidatorConfirmRequired": "አዲሱን የይለፍ ቃል ያረጋግጡ",
+  "settingsValidatorPasswordsMismatch": "የይለፍ ቃሎች አይጣጣሙም",
+  "settingsUpdatePasswordButton": "የይለፍ ቃል አዘምን",
+  "brandCarCare": "CarCare",
+  "commonRetry": "እንደገና ሞክር",
+  "commonCancel": "ተወው",
+  "commonYes": "አዎ",
+  "commonNo": "አይ",
+  "commonContinue": "ቀጥል",
+  "commonBack": "ተመለስ",
+  "commonSubmit": "ላክ",
+  "commonDelete": "ሰርዝ",
+  "commonEdit": "አርትዖት",
+  "commonReport": "ሪፖርት",
+  "commonSave": "አስቀምጥ",
+  "commonAdd": "ጨምር",
+  "commonClear": "አጽዳ",
+  "commonViewAll": "ሁሉንም አሳይ",
+  "commonRemove": "አስወግድ",
+  "commonBook": "ቦክ",
+  "commonCall": "ደውል",
+  "commonRoute": "መንገድ",
+  "commonNavigate": "አቅጣጫ",
+  "commonGuest": "እንግዳ",
+  "commonEmDash": "—",
+  "drawerNavSection": "አሰሳ",
+  "drawerAccountSection": "መለያ",
+  "drawerHome": "መነሻ",
+  "drawerMyVehicles": "የእኔ ተሽከርካሪዎች",
+  "drawerService": "አገልግሎት",
+  "drawerCommunity": "ማህበረሰብ",
+  "drawerEducation": "ትምህርት",
+  "drawerProfile": "መገለጫ",
+  "drawerSettings": "ቅንብሮች",
+  "drawerHelpSupport": "እገዛ እና ድጋፍ",
+  "drawerLogout": "ውጣ",
+  "onbTitle1": "የመኪናዎን ጤና ይወቁ",
+  "onbBody1": "የተሽከርካሪ ዝርዝሮች፣ የጥገና ሁኔታ እና የሚመጡ አገልግሎቶችን በአንድ ቦታ ይከታተሉ።",
+  "onbTitle2": "ጥገናን አይተውትም",
+  "onbBody2": "ለዘይት ለውጥ፣ የጎማ ምርመራ እና አገልግሎቶች በወቅቱ አስታዋሾች ያግኙ።",
+  "onbTitle3": "እገዛ ሲፈልጉ ያግኙ",
+  "onbBody3": "በአቅራቢያ ያሉ ጋራጆችን ያግኙ፣ አገልግሎቶችን ይያዙ ወይም በማንኛውም ጊዜ እገዛ ይጠይቁ።",
+  "onbTitle4": "የኤአይ የመኪና ረዳት ይጠይቁ",
+  "onbBody4": "ለፈጣን እገዛ፣ የጥገና ምክሮች እና ስለ ተሽከርካሪዎ መልስ ከኤአይ ረዳት ጋር ይወያዩ።",
+  "onbTitle5": "ይማሩ። ያጋሩ። በተሻለ ይነዱ።",
+  "onbBody5": "የመኪና እንክብካብ መመሪያዎችን ያስሱ እና ልምድ ለመጋራት ከሌሎች አሽከርካሪዎች ጋር ይገናኙ።",
+  "onbTitle6": "በተሻለ ለመነዳት ዝግጁ ነዎት?",
+  "onbBody6": "ተሽከርካሪያቸውን በጥሩ ሁኔታ ለመጠበቅ የእኛን እምነት ያደርጋሉ በሺዎች የሚቆጠሩ አሽከርካሪዎች ይቀላቀሉ።",
+  "onbSkip": "ዝለል",
+  "onbGetStarted": "ጀምር",
+  "profileTitle": "መገለጫ",
+  "profileUpdated": "መገለጫ ተዘምኗል",
+  "profileFirstName": "የመጀመሪያ ስም",
+  "profileLastName": "የአባት ስም",
+  "profileEmail": "ኢሜይል",
+  "profilePleaseSignIn": "እባክዎ ይግቡ።",
+  "commCreatePost": "ልጥፍ ፍጠር",
+  "commReportPost": "ልጥፍ ሪፖርት",
+  "commReportSpam": "ስፓም",
+  "commReportHarassment": "ማሳደድ",
+  "commReportHate": "የጥላቻ ንግግር",
+  "commReportFalseInfo": "ሀሰተኛ መረጃ",
+  "commReportViolence": "አመጽ",
+  "commReportNudity": "ዕራፍ ወይም የግብረሰው ምስል",
+  "commReportScam": "ማጭበርበር",
+  "commReportOther": "ሌላ",
+  "eduClear": "አጽዳ",
+  "eduViewAll": "ሁሉንም አሳይ",
+  "eduRetry": "እንደገና ሞክር",
+  "eduGetManual": "መመሪያ አምጣ",
+  "eduInvalidPdf": "የማይሰራ የፒዲኤፍ አገናኝ።",
+  "eduCouldNotOpenManual": "ይህን መመሪያ መክፈት አልተቻለም።",
+  "notifMarkAllRead": "ሁሉንም እንደተነበበ ምልክት አድርግ",
+  "vehScheduleMaintenance": "ጥገና ያስቀምጡ",
+  "maintSetReminder": "የጥገና አስታዋሽ ያስቀምጡ",
+  "maintDone": "ተጠናቋል",
+  "maintDelete": "ሰርዝ",
+  "logMaintNoVehicle": "ተሽከርካሪ የለም",
+  "bookWizardGarageError": "የጋራጅ ተገኝነት መጫን አልተቻለም",
+  "bookWizardAddVehicle": "ተሽከርካሪ ጨምር",
+  "bookWizardSlotUnavailable": "የተመረጠው ጊዜ የለም። የሚገኝ ቦታ ይምረጡ።",
+  "bookWizardBackHome": "ወደ መነሻ ተመለስ",
+  "bookWizardViewAppointments": "ሁሉንም ቀጠሮዎች አሳይ",
+  "svcApptUpdated": "ቀጠሮ ተዘምኗል።",
+  "svcRetry": "እንደገና ሞክር",
+  "svcRateGarage": "ጋራጅ ደረጃ ስጥ",
+  "svcReschedule": "እንደገና ያስቀምጡ",
+  "svcCancel": "ተወው",
+  "svcRateExperienceTitle": "የአገልግሎት ልምድዎ እንዴት ነበር?",
+  "svcRatingThanks": "እናመሰግናለን! ደረጃዎ ተልኳል።",
+  "svcCancelApptTitle": "ቀጠሮ ይሰረዝ?",
+  "svcCancelApptBody": "ይህ እርምጃ ሊቀለበስ አይችልም።",
+  "svcBook": "ያስይዙ",
+  "svcCall": "ደውል",
+  "svcRoute": "መንገድ",
+  "svcNoPhone": "ለዚህ ጋራጅ ስልክ ቁጥር የለም።",
+  "svcCallNotSupported": "በዚህ መሳሪያ ላይ ጥሪ አይደገፍም።",
+  "apptCancelTitle": "ቀጠሮ ይሰረዝ?",
+  "apptCancelBody": "ይህ እርምጃ ሊቀለበስ አይችልም።",
+  "mapLocationRequired": "በአቅራቢያ ቦታዎችን ለመጫን ቦታ ያስፈልጋል",
+  "mapRoutingLocationRequired": "ለመንገድ አቅጣጫ የአሁኑ ቦታ ያስፈልጋል",
+  "mapRouteUpdated": "መንገዱ ወደ የተጫነው ቦታ ተዘምኗል",
+  "mapSetAsStart": "እንደ መነሻ አስቀምጥ",
+  "mapApptBooked": "ቀጠሮ በተሳካ ሁኔታ ተያዘ",
+  "mapGettingLocation": "ቦታዎን በመጫን ላይ...",
+  "mapBookAppointment": "ቀጠሮ ያስይዙ",
+  "mapRequestOnsite": "በቦታ ላይ አገልግሎት ይጠይቁ",
+  "vehDetailRemoved": "ተሽከርካሪ ተወግዷል።",
+  "vehDetailAskAi": "የኤአይ ረዳት ይጠይቁ",
+  "vehDetailEditVehicle": "ተሽከርካሪ አርትዖት",
+  "vehDetailRemoveVehicle": "ተሽከርካሪ አስወግድ",
+  "vehDetailRemoveTitle": "ተሽከርካሪ ይወገድ?",
+  "vehDetailInsurance": "ኢንሹራንስ",
+  "vehDetailRegistration": "መዝገብ",
+  "vehDetailViewDocuments": "ሰነዶችን አሳይ",
+  "vehDetailInsuranceDoc": "የኢንሹራንስ ሰነድ",
+  "vehDetailRegistrationDoc": "የመዝገብ ሰነድ",
+  "vehDetailTitle": "የተሽከርካሪ ዝርዝሮች",
+  "vehDetailRemoveConfirmBody": "{name} ይወገዳል። ይህ እርምጃ ሊቀለበስ አይችልም።",
+  "vehDetailHealthUnavailable": "አጠቃላይ ጤና ማግኘት አልተቻለም",
+  "vehDetailHealthRetryHint": "ለማደስ ይጎትቱ ወይም እንደገና ይሞክሩ።",
+  "vehDetailDocumentsSection": "ሰነዶች",
+  "vehDetailVehicleInformation": "የተሽከርካሪ መረጃ",
+  "vehDetailMakeModel": "አምራች እና ሞዴል",
+  "vehDetailYear": "ዓመት",
+  "vehDetailVin": "VIN",
+  "vehDetailMileage": "ኪሎ ሜትር",
+  "vehDetailFuelType": "የነዳጅ አይነት",
+  "vehDetailInsuranceActiveExpires": "ንቁ - ይጠፋል {date}",
+  "vehDetailRegistrationValidExpires": "ትክክለኛ - ይጠፋል {date}",
+  "vehDetailNoDocumentsAvailable": "ምንም ሰነድ የለም።",
+  "commonMilesUnit": "ማይል",
+  "addVehSuccessAdded": "ተሽከርካሪ በተሳካ ሁኔታ ተጨመረ።",
+  "addVehSuccessUpdated": "ተሽከርካሪ ተዘምኗል።",
+  "addVehFileSelected": "ተመርጧል፦ {name}",
+  "addVehFilePickerError": "ፋይል መራጭ መክፈት አልተቻለም፦ {error}",
+  "addVehFillRequired": "አምራች፣ ሞዴል እና የሰሌዳ ቁጥር ይሙሉ።",
+  "addVehSaveChanges": "ለውጦችን አስቀምጥ",
+  "addVehSelectFile": "ፋይል ይምረጡ",
+  "addVehVehicleSummary": "የተሽከርካሪ ማጠቃለያ",
+  "addVehAddVehicle": "ተሽከርካሪ ጨምር",
+  "addVehEditDetails": "ዝርዝሮችን አርትዖት",
+  "addVehReadyConfirmBanner": "ይህን ተሽከርካሪ በጋራጅዎ ለመጨመር ዝግጁ ነው። ዝርዝሮችን በማንኛውም ጊዜ ማርትዕ ይችላሉ።",
+  "postImagesTooLarge": "የተመረጡ ምስሎች በጣም ትልቅ ነበሩ።",
+  "postImagesExceedServer": "ምስሎች የሰርቨር ገደብን ያልፋሉ።",
+  "postImagesSomeSkipped": "የሰርቨር መጫን ለማሳካት አንዳንድ ምስሎች ተዘለሉ።",
+  "postImagesRemoveSome": "ምስሎች ትልቅ ናቸው። አንዳንዶችን ያስወግዱ እና እንደገና ይሞክሩ።",
+  "postAddPhotos": "ፎቶዎች ጨምር",
+  "aiAssistantTitle": "የኤአይ ረዳት",
+  "aiChatHistoryTitle": "የውይይት ታሪክ",
+  "aiStartNewChat": "አዲስ ውይይት ጀምር",
+  "aiDeleteSessionTitle": "የውይይት ክፍለ ጊዜ ይሰረዝ?",
+  "aiDeleteSessionBody": "ውይይቱ ከታሪክ ይወገዳል። ይህ እርምጃ ሊቀለበስ አይችልም።",
+  "timeJustNow": "አሁን",
+  "timeMinAgo": "ከ{count} ደቂቃ በፊት",
+  "timeHrAgo": "ከ{count} ሰዓት በፊት",
+  "timeDaysAgo": "ከ{count} ቀን በፊት",
+  "routerPageNotFound": "ስህተት፦ ገጽ አልተገኘም",
+  "mapRouteNumbered": "መንገድ {routeNumber}",
+  "scheduleMaintRetry": "እንደገና ሞክር",
+  "scheduleMaintAdd": "ጨምር",
+  "@addVehFileSelected": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@addVehFilePickerError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@timeMinAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@timeHrAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@mapRouteNumbered": {
+    "placeholders": {
+      "routeNumber": {
+        "type": "int"
+      }
+    }
+  },
+  "profileSubtitle": "ስምዎን እና ኢሜይልዎን ያዘምኑ። ለውጦች በመሳቢያው ይታያሉ።",
+  "profileHintFirstName": "የመጀመሪያ ስም",
+  "profileHintLastName": "የአባት ስም",
+  "profileHintEmail": "ኢሜይል",
+  "profileSaveChanges": "ለውጦችን አስቀምጥ",
+  "commNoPostsFound": "ልጥፎች አልተገኙም።",
+  "commReportDetailsHint": "ምን እንደተሳሳተ ይንገሩን",
+  "commCommunityTitle": "ማህበረሰብ",
+  "commCommunitySubtitle": "ከመኪና ባለቤቶች ጋር ይገናኙ",
+  "timeWeeksAgo": "ከ{count} ሳምንት በፊት",
+  "commComments": "አስተያየቶች",
+  "commNoComments": "አስተያየት የለም።",
+  "commWriteComment": "አስተያየት ይጻፉ",
+  "commActionsTooltip": "ድርጊቶች",
+  "@timeWeeksAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commShowMore": "ተጨማሪ አሳይ",
+  "commShowLess": "ያነሰ አሳይ",
+  "commSearchHint": "ልጥፎችን ፈልግ...",
+  "commInvalidImage": "የማይሰራ ምስል",
+  "commCannotLoadImage": "ምስል መጫን አልተቻለም",
+  "commInvalidImageUrl": "የማይሰራ የምስል አድራሻ",
+  "tabAll": "ሁሉም",
+  "tabMyPosts": "የእኔ ልጥፎች",
+  "tabBookmarks": "ምልክቶች",
+  "navHome": "መነሻ",
+  "navVehicle": "ተሽከርካሪ",
+  "navService": "አገልግሎት",
+  "navCommunity": "ማህበረሰብ",
+  "navEducation": "ትምህርት",
+  "notifTitle": "ማስታወሻዎች",
+  "notifSubtitle": "የጥገና አስታዋሾች እና የመተግበሪያ ዝመናዎች",
+  "commonGarage": "ጋራጅ",
+  "apptGarageLine": "ጋራጅ፦ {name}",
+  "apptCarLine": "መኪና፦ {name}",
+  "apptServiceDefault": "አገልግሎት",
+  "@apptGarageLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@apptCarLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "navVehicles": "ተሽከርካሪዎች",
+  "navEduShort": "ትም.",
+  "dashNoVehicle": "ተሽከርካሪ የለም",
+  "dashAddVehiclePlateHint": "ተሽከርካሪ ጨምር",
+  "dashSelectVehicleForHealth": "የመኪና ጤና ለመጫን ተሽከርካሪ ይምረጡ ወይም ያክሉ።",
+  "dashCouldNotLoadVehicleHealth": "የተሽከርካሪ ጤና መጫን አልተቻለም።",
+  "dashVehicleHealthTitle": "የተሽከርካሪ ጤና",
+  "dashOverallCarHealthTitle": "አጠቃላይ የመኪና ጤና",
+  "dashHealthScoresFallback": "ውጤቶች ከዚህ ተሽከርካሪ የጥገና እንቅስቃሴ እና የጋራጅ ውሂብ ይመነጫሉ።",
+  "dashNoSubsystemData": "እስካሁን የ ንዑስ ስርዓት ውሂብ የለም።",
+  "dashMaintenanceRemindersTitle": "የጥገና አስታዋሾች",
+  "dashViewAll": "ሁሉንም አሳይ",
+  "dashNoRemindersYet": "እስካሁን አስታዋሽ የለም። ጥገና ያስቀምጡ።",
+  "dashOverdueByDays": "በ{days} ቀን ተዘግይቷል",
+  "dashDueToday": "ዛሬ ይጠበቃል",
+  "dashDueTomorrow": "ነገ ይጠበቃል",
+  "dashDueInDays": "በ{days} ቀን ይጠበቃል",
+  "dashDueInWeeks": "በ{weeks} ሳምንት ይጠበቃል",
+  "dashStatusUrgent": "አስቸኳይ",
+  "dashStatusSoon": "በቅርቡ",
+  "dashStatusGood": "ጥሩ",
+  "dashStatusDone": "ተጠናቋል",
+  "dashPlateLine": "ሰሌዳ {plate}",
+  "dashQuickActionsTitle": "ፈጣን ድርጊቶች",
+  "dashBookService": "አገልግሎት ያስይዙ",
+  "dashFindNearbyGarage": "በአቅራቢያ ጋራጅ ያግኙ",
+  "dashChatAiAssistant": "ከኤአይ ረዳት ይወያዩ",
+  "dashMaintenanceHistory": "የጥገና ታሪክ",
+  "dashRecentActivityTitle": "የቅርብ እንቅስቃሴ",
+  "dashNoRecentActivity": "እስካሁን እንቅስቃሴ የለም።",
+  "dashActivityCompleted": "{title} ተጠናቋል",
+  "dashVehicleAdded": "ተሽከርካሪ ተጨመረ፦ {name}",
+  "timeMonthsAgo": "ከ{count} ወር በፊት",
+  "vehListTitleMyVehicles": "የእኔ ተሽከርካሪዎች",
+  "vehListTitleUpcoming": "የሚመጣ ጥገና",
+  "vehListTitleHistory": "የጥገና ታሪክ",
+  "vehListSubtitleMyVehicles": "ተሽከርካሪዎችዎን እና ጥገና ያቀናብሩ",
+  "vehListSubtitleUpcoming": "የታቀዱ እና የሚመከሩ አገልግሎቶች",
+  "vehListSubtitleHistory": "የታቀዱ አስታዋሾች እና የተጠናቀቁ አገልግሎቶች",
+  "vehSegmentMyVehicles": "የእኔ ተሽከርካሪዎች",
+  "vehSegmentUpcoming": "የሚመጣ",
+  "vehSegmentHistory": "ታሪክ",
+  "vehRetry": "እንደገና ሞክር",
+  "vehFabAddNewVehicle": "አዲስ ተሽከርካሪ ጨምር",
+  "vehFabRegisterAnother": "ሌላ መኪና ይመዝገቡ",
+  "vehHistoryEmpty": "እስካሁን ምንም የለም።\n\nየታቀዱ አስታዋሾች እና የተጠናቀቁ አገልግሎቶች እዚህ ከሁኔታ (ጥሩ፣ በቅርቡ፣ ተዘግይቷል፣ ተጠናቋል) ጋር ይታያሉ። ጥገና ለማስቀመጥ ወይም እንደተጠናቀቀ ለማመልከት የሚመጣን ይጠቀሙ።",
+  "vehCardStatusGood": "ጥሩ",
+  "vehCardStatusAttention": "ትኩረት",
+  "eduAllArticlesTitle": "ሁሉም መጣጥፎች",
+  "eduArticlesInCategory": "{category} መጣጥፎች",
+  "eduNoArticlesInCategory": "በዚህ ምድብ መጣጥፎች የሉም።",
+  "eduArticleLabel": "መጣጥፍ",
+  "eduCategoryGuide": "{category} መመሪያ",
+  "eduCouldNotLoadArticle": "ይህን መጣጥፍ መጫን አልተቻለም።",
+  "eduReadMinutes": "{minutes} ደቂቃ",
+  "eduCenterTitle": "የትምህርት ማዕከል",
+  "eduCenterSubtitle": "ተሽከርካሪዎን እንዴት እንደሚጠብቁ ይማሩ",
+  "eduSearchHint": "መመሪያዎችን እና መጣጥፎችን ይፈልጉ...",
+  "eduResultsFor": "ውጤቶች ለ \"{query}\"",
+  "eduFeaturedArticles": "የተመረጡ መጣጥፎች",
+  "eduNoArticlesMatchSearch": "ለፍለጋዎ የሚስማሙ መጣጥፎች የሉም።",
+  "eduNoArticlesYet": "እስካሁን መጣጥፎች የሉም። በቅርቡ ይመለሱ።",
+  "eduCategoryArticleCount": "{count} መጣጥፎች",
+  "eduCatRepairs": "ጥገና",
+  "eduCatSafety": "ደህንነት",
+  "eduCatMaintenance": "ጥገና አስተዳደር",
+  "eduCatTips": "ምክሮች",
+  "eduCatManuals": "መመሪያዎች",
+  "eduReadMore": "አንብብ ›",
+  "eduDifficultyBeginner": "ጀማሪ",
+  "eduDifficultyIntermediate": "መካከለኛ",
+  "eduTopicSafety": "የደህንነት ምክሮች",
+  "eduTopicMaintenance": "የጥገና መሰረታዊ እውቀት",
+  "eduTopicRepairs": "የጥገና መመሪያዎች",
+  "eduTopicTips": "ምክሮች እና ዘዴዎች",
+  "eduTopicAll": "መመሪያ",
+  "eduTopicManuals": "መመሪያ መጽሐፍ",
+  "svcLocServicesDisabled": "የቦታ አገልግሎቶች ተሰናክለዋል። በአቅራቢያ ጋራጆችን ለማየት ያብሩ።",
+  "svcLocPermissionDeniedForever": "የቦታ ፍቃድ ለዘለዓለም ተከልክሏል። ከመተግበሪያ ቅንብሮች ይፍቀዱ።",
+  "svcLocPermissionDenied": "የቦታ ፍቃድ ተከልክሏል። በአቅራቢያ ጋራጆችን ለማግኘት ፍቃድ ይፍቀዱ።",
+  "svcLocFetchFailed": "ቦታዎን ማምጣት አልተቻለም። የተለዋዋጭ ውጤቶች ይታያሉ።",
+  "svcServiceCentersTitle": "የአገልግሎት ማዕከሎች",
+  "svcServiceCentersSubtitle": "በአቅራቢያ ጋራጆች ያግኙ እና አገልግሎት ያስይዙ",
+  "svcUpcomingAppointments": "የሚመጡ ቀጠሮዎች",
+  "svcNoUpcomingAppointments": "የሚመጡ ቀጠሮዎች የሉም",
+  "svcNearbyCentersTitle": "በአቅራቢያ የአገልግሎት ማዕከሎች",
+  "svcNoNearbyGarages": "በአቅራቢያ ጋራጅ አልተገኘም።",
+  "svcOpen": "ክፍት",
+  "svcClosed": "ዝግ",
+  "svcViewReviews": "ግምገማዎችን አሳይ",
+  "svcReviewsRatingTitle": "ግምገማ እና ደረጃ",
+  "svcReviewCount": "{count, plural, =1{1 ግምገማ} other{{count} ግምገማዎች}}",
+  "svcReviewsLoadError": "ግምገማዎችን አሁን መጫን አልተቻለም።",
+  "svcReviewsEmpty": "ለዚህ ጋራጅ እስካሁን ግምገማ የለም።",
+  "svcReviewNoComment": "አስተያየት የለም",
+  "svcReviewAnonymousDriver": "አሽከርካሪ",
+  "svcUnknownDate": "ያልታወቀ ቀን",
+  "svcMapView": "የካርታ እይታ",
+  "svcApptsPageTitle": "ቀጠሮዎች",
+  "svcApptsListTitle": "ቀጠሮዎች",
+  "svcApptsListSubtitle": "የእርስዎን ቦታያዘት ይመልከቱ እና ያቀናብሩ",
+  "svcNoAppointmentsFound": "ቀጠሮ አልተገኘም",
+  "svcNoAppointmentsYet": "እስካሁን ቀጠሮ የለም",
+  "svcUnableSubmitRating": "ደረጃ ማስረከብ አልተቻለም",
+  "svcUnableLoadGarages": "በአቅራቢያ ጋራጆችን መጫን አልተቻለም።",
+  "svcRateTapStar": "ለመደረጃ ኮከብ ይንኩ",
+  "svcRateStarsSelected": "{count, plural, =1{1 ኮከብ ተመርጧል} other{{count} ኮከቦች ተመርጠዋል}}",
+  "svcRateFeedbackHint": "አማራጭ አስተያየት ይጻፉ",
+  "apptStatusPending": "በመጠባበቅ ላይ",
+  "apptStatusConfirmed": "ተረጋግጧል",
+  "apptStatusRejected": "ተቀባይነት አላገኘም",
+  "apptStatusInService": "በአገልግሎት ውስጥ",
+  "apptStatusCompleted": "ተጠናቋል",
+  "apptStatusCancelled": "ተሰርዟል",
+  "@dashOverdueByDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashDueInDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashDueInWeeks": {
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
+  "@dashPlateLine": {
+    "placeholders": {
+      "plate": {
+        "type": "String"
+      }
+    }
+  },
+  "@dashActivityCompleted": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@dashVehicleAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@timeMonthsAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@eduArticlesInCategory": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "@eduCategoryGuide": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "@vehDetailRemoveConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@vehDetailInsuranceActiveExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@vehDetailRegistrationValidExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@eduReadMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@eduResultsFor": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "@eduCategoryArticleCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@svcReviewCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@svcRateStarsSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

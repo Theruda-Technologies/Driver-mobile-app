@@ -9,6 +9,9 @@ import 'service_locator_state.dart';
 
 class ServiceLocatorBloc
     extends Bloc<ServiceLocatorEvent, ServiceLocatorState> {
+  /// UI maps this to [AppLocalizations.svcUnableLoadGarages].
+  static const String kFailureUnableLoadNearby = '__failure_unable_load_nearby__';
+
   ServiceLocatorBloc(this._getNearbyGarages)
     : super(ServiceLocatorState.initial()) {
     on<InitializeServiceLocator>(_onInitialize);
@@ -60,7 +63,7 @@ class ServiceLocatorBloc
       emit(
         state.copyWith(
           isLoading: false,
-          failureMessage: 'Unable to load nearby garages.',
+          failureMessage: kFailureUnableLoadNearby,
         ),
       );
     }

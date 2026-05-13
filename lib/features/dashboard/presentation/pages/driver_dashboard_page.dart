@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/dimensions.dart';
 import '../../../../core/widgets/app_drawer.dart';
+import '../../../../core/widgets/driver_shell_bottom_nav_bar.dart';
 import '../../../../core/widgets/nav_app_bar.dart';
 import '../../../../injection/service_locator.dart';
 import '../../../maintenance/application/usecases/get_vehicle_health_usecase.dart';
@@ -31,7 +33,7 @@ class DriverDashboardPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(currentRoute: '/driver-dashboard'),
-      appBar: const NavAppBar(title: 'CarCare', notificationCount: null),
+      appBar: NavAppBar.mainShell(context, showStaticNotificationBadge: false),
       body: SafeArea(
         child: BlocProvider(
           create: (_) =>
@@ -39,7 +41,7 @@ class DriverDashboardPage extends StatelessWidget {
           child: const _DashboardBody(),
         ),
       ),
-      bottomNavigationBar: const _BottomNavBar(),
+      bottomNavigationBar: const DriverShellBottomNavBar(current: DriverShellTab.home),
       floatingActionButton: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
@@ -209,8 +211,9 @@ class _VehicleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayName = vehicle?.displayName ?? 'No vehicle';
-    final plate = vehicle?.plateNumber ?? 'Add a vehicle';
+    final l10n = AppLocalizations.of(context)!;
+    final displayName = vehicle?.displayName ?? l10n.dashNoVehicle;
+    final plate = vehicle?.plateNumber ?? l10n.dashAddVehiclePlateHint;
 
     return InkWell(
       onTap: onTap,
@@ -437,6 +440,7 @@ class _VehicleHealthSectionState extends State<_VehicleHealthSection> {
   @override
   Widget build(BuildContext context) {
     final id = widget.selectedVehicleId?.trim();
+    final l10n = AppLocalizations.of(context)!;
 
     BoxDecoration cardDeco() => BoxDecoration(
           color: AppColors.surface,
@@ -455,7 +459,7 @@ class _VehicleHealthSectionState extends State<_VehicleHealthSection> {
         padding: const EdgeInsets.all(Spacing.md),
         decoration: cardDeco(),
         child: Text(
-          'Add or select a vehicle to load car health from the server.',
+          l10n.dashSelectVehicleForHealth,
           style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
         ),
       );
@@ -478,7 +482,7 @@ class _VehicleHealthSectionState extends State<_VehicleHealthSection> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Could not load vehicle health.',
+              l10n.dashCouldNotLoadVehicleHealth,
               style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: Spacing.xs),
@@ -488,7 +492,7 @@ class _VehicleHealthSectionState extends State<_VehicleHealthSection> {
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
             ),
-            TextButton(onPressed: _load, child: const Text('Retry')),
+            TextButton(onPressed: _load, child: Text(AppLocalizations.of(context)!.commonRetry)),
           ],
         ),
       );
@@ -505,7 +509,7 @@ class _VehicleHealthSectionState extends State<_VehicleHealthSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Vehicle Health',
+            l10n.dashVehicleHealthTitle,
             style: AppTextStyles.titleSmall.copyWith(
               color: AppColors.textPrimary,
             ),
@@ -541,7 +545,7 @@ class _VehicleHealthSectionState extends State<_VehicleHealthSection> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Overall car health',
+                      l10n.dashOverallCarHealthTitle,
                       style: AppTextStyles.titleSmall.copyWith(
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.w700,
@@ -551,7 +555,7 @@ class _VehicleHealthSectionState extends State<_VehicleHealthSection> {
                     Text(
                       (h.summary != null && h.summary!.trim().isNotEmpty)
                           ? h.summary!.trim()
-                          : 'Scores come from your maintenance activity and garage data for this vehicle.',
+                          : l10n.dashHealthScoresFallback,
                       maxLines: 4,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, height: 1.35),
@@ -570,7 +574,7 @@ class _VehicleHealthSectionState extends State<_VehicleHealthSection> {
           ] else ...[
             const SizedBox(height: Spacing.sm),
             Text(
-              'No subsystem data yet.',
+              l10n.dashNoSubsystemData,
               style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
             ),
           ],
@@ -585,6 +589,7 @@ class _MaintenanceRemindersSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -592,7 +597,7 @@ class _MaintenanceRemindersSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Maintenance Reminders',
+              l10n.dashMaintenanceRemindersTitle,
               style: AppTextStyles.titleSmall.copyWith(
                 color: AppColors.textPrimary,
               ),
@@ -604,7 +609,7 @@ class _MaintenanceRemindersSection extends StatelessWidget {
                 arguments: {'tab': 1},
               ),
               child: Text(
-                'View all',
+                l10n.dashViewAll,
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.secondary,
                   fontWeight: FontWeight.w600,
@@ -624,7 +629,7 @@ class _MaintenanceRemindersSection extends StatelessWidget {
               }
               if (items.isEmpty) {
                 return Text(
-                  'No reminders yet. Schedule maintenance to get started.',
+                  l10n.dashNoRemindersYet,
                   style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
                 );
               }
@@ -635,8 +640,8 @@ class _MaintenanceRemindersSection extends StatelessWidget {
                       title: items[i].title,
                       vehicleMakeModel: _trimOrNull(items[i].vehicleLabel),
                       vehiclePlate: _trimOrNull(items[i].vehiclePlate),
-                      subtitle: _dueText(items[i].scheduledAt),
-                      statusLabel: _statusLabelFromItem(items[i]),
+                      subtitle: _dueText(items[i].scheduledAt, l10n),
+                      statusLabel: _statusLabelFromItem(items[i], l10n),
                       statusColor: _statusColorFromItem(items[i]),
                       borderColor: _statusColorFromItem(items[i]),
                       icon: _iconFor(items[i].title),
@@ -658,46 +663,46 @@ class _MaintenanceRemindersSection extends StatelessWidget {
     return t;
   }
 
-  static String _dueText(DateTime date) {
+  static String _dueText(DateTime date, AppLocalizations l10n) {
     final today = DateTime.now();
     final d0 = DateTime(today.year, today.month, today.day);
     final d1 = DateTime(date.year, date.month, date.day);
     final diff = d1.difference(d0).inDays;
-    if (diff < 0) return 'Overdue by ${diff.abs()} days';
-    if (diff == 0) return 'Due today';
-    if (diff == 1) return 'Due tomorrow';
-    if (diff < 7) return 'Due in $diff days';
+    if (diff < 0) return l10n.dashOverdueByDays(diff.abs());
+    if (diff == 0) return l10n.dashDueToday;
+    if (diff == 1) return l10n.dashDueTomorrow;
+    if (diff < 7) return l10n.dashDueInDays(diff);
     final weeks = (diff / 7).round();
-    return 'Due in $weeks weeks';
+    return l10n.dashDueInWeeks(weeks);
   }
 
-  static String _statusLabelFromItem(MaintenanceUpcoming m) {
+  static String _statusLabelFromItem(MaintenanceUpcoming m, AppLocalizations l10n) {
     final s = m.displayStatus?.toUpperCase();
     if (s != null && s.isNotEmpty) {
       switch (s) {
         case 'URGENT':
-          return 'Urgent';
+          return l10n.dashStatusUrgent;
         case 'SOON':
-          return 'Soon';
+          return l10n.dashStatusSoon;
         case 'GOOD':
-          return 'Good';
+          return l10n.dashStatusGood;
         case 'DONE':
-          return 'Done';
+          return l10n.dashStatusDone;
         default:
           return s;
       }
     }
-    return _statusLabel(m.scheduledAt);
+    return _statusLabel(m.scheduledAt, l10n);
   }
 
-  static String _statusLabel(DateTime date) {
+  static String _statusLabel(DateTime date, AppLocalizations l10n) {
     final today = DateTime.now();
     final d0 = DateTime(today.year, today.month, today.day);
     final d1 = DateTime(date.year, date.month, date.day);
     final diff = d1.difference(d0).inDays;
-    if (diff < 0) return 'Urgent';
-    if (diff <= 3) return 'Soon';
-    return 'Good';
+    if (diff < 0) return l10n.dashStatusUrgent;
+    if (diff <= 3) return l10n.dashStatusSoon;
+    return l10n.dashStatusGood;
   }
 
   static Color _statusColorFromItem(MaintenanceUpcoming m) {
@@ -759,6 +764,7 @@ class _ReminderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(Spacing.md),
       decoration: BoxDecoration(
@@ -801,7 +807,7 @@ class _ReminderCard extends StatelessWidget {
                 if (vehiclePlate != null && vehiclePlate!.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
-                    'Plate $vehiclePlate',
+                    l10n.dashPlateLine(vehiclePlate!),
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -845,11 +851,12 @@ class _QuickActionsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Quick Actions',
+          l10n.dashQuickActionsTitle,
           style: AppTextStyles.titleSmall.copyWith(
             color: AppColors.textPrimary,
           ),
@@ -858,7 +865,7 @@ class _QuickActionsSection extends StatelessWidget {
         Column(
           children: [
             _PrimaryActionButton(
-              label: 'Book Service',
+              label: l10n.dashBookService,
               icon: Icons.calendar_today_outlined,
               gradientColors: [AppColors.secondary, AppColors.secondaryDark],
               onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
@@ -868,7 +875,7 @@ class _QuickActionsSection extends StatelessWidget {
             ),
             SizedBox(height: Spacing.sm),
             _OutlinedActionButton(
-              label: 'Find Nearby Garage',
+              label: l10n.dashFindNearbyGarage,
               icon: Icons.location_on_outlined,
               onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
                 '/services',
@@ -877,13 +884,13 @@ class _QuickActionsSection extends StatelessWidget {
             ),
             SizedBox(height: Spacing.sm),
             _FilledActionButton(
-              label: 'Chat with AI Assistant',
+              label: l10n.dashChatAiAssistant,
               icon: Icons.chat_bubble_outline,
               onTap: () => Navigator.of(context).pushNamed('/ai-chat'),
             ),
             const SizedBox(height: Spacing.sm),
             _OutlinedActionButton(
-              label: 'Maintenance History',
+              label: l10n.dashMaintenanceHistory,
               icon: Icons.history_rounded,
               onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
                 '/vehicles',
@@ -1090,11 +1097,12 @@ class _RecentActivitySectionState extends State<_RecentActivitySection> {
       ],
       child: Builder(
         builder: (context) {
+          final l10n = AppLocalizations.of(context)!;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Recent Activity',
+                l10n.dashRecentActivityTitle,
                 style: AppTextStyles.titleSmall.copyWith(
                   color: AppColors.textPrimary,
                 ),
@@ -1120,6 +1128,7 @@ class _RecentActivitySectionState extends State<_RecentActivitySection> {
                         final items = _buildRecentActivities(
                           maintenance: mState,
                           vehicles: vState,
+                          l10n: l10n,
                         );
                         if (items.isEmpty && (mState.loading || vState is VehiclesLoading || vState is VehiclesInitial)) {
                           return const Center(
@@ -1131,7 +1140,7 @@ class _RecentActivitySectionState extends State<_RecentActivitySection> {
                         }
                         if (items.isEmpty) {
                           return Text(
-                            'No recent activity yet.',
+                            l10n.dashNoRecentActivity,
                             style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
                           );
                         }
@@ -1163,6 +1172,7 @@ class _RecentActivitySectionState extends State<_RecentActivitySection> {
   List<_ActivityItem> _buildRecentActivities({
     required MaintenanceState maintenance,
     required VehiclesState vehicles,
+    required AppLocalizations l10n,
   }) {
     final now = DateTime.now();
     final items = <_ActivityItem>[];
@@ -1174,8 +1184,8 @@ class _RecentActivitySectionState extends State<_RecentActivitySection> {
           ts: h.date,
           icon: Icons.check_circle_rounded,
           iconColor: AppColors.success,
-          title: '${h.title} completed',
-          subtitle: _historyActivitySubtitle(h, vehicles, now),
+          title: l10n.dashActivityCompleted(h.title),
+          subtitle: _historyActivitySubtitle(h, vehicles, now, l10n),
         ),
       );
     }
@@ -1192,8 +1202,8 @@ class _RecentActivitySectionState extends State<_RecentActivitySection> {
             ts: ts,
             icon: Icons.add_circle_outline_rounded,
             iconColor: AppColors.secondary,
-            title: 'Vehicle added: ${_vehicleLabel(v)}',
-            subtitle: _timeAgo(ts, now),
+            title: l10n.dashVehicleAdded(_vehicleLabel(v)),
+            subtitle: _timeAgo(ts, now, l10n),
           ),
         );
       }
@@ -1203,8 +1213,13 @@ class _RecentActivitySectionState extends State<_RecentActivitySection> {
     return items.take(5).toList();
   }
 
-  static String _historyActivitySubtitle(MaintenanceHistory h, VehiclesState vehicles, DateTime now) {
-    final ago = _timeAgo(h.date, now);
+  static String _historyActivitySubtitle(
+    MaintenanceHistory h,
+    VehiclesState vehicles,
+    DateTime now,
+    AppLocalizations l10n,
+  ) {
+    final ago = _timeAgo(h.date, now, l10n);
     if (vehicles is! VehiclesLoaded || h.vehicleId == null || h.vehicleId!.isEmpty) {
       return ago;
     }
@@ -1224,16 +1239,16 @@ class _RecentActivitySectionState extends State<_RecentActivitySection> {
     return v.plateNumber;
   }
 
-  static String _timeAgo(DateTime ts, DateTime now) {
+  static String _timeAgo(DateTime ts, DateTime now, AppLocalizations l10n) {
     final diff = now.difference(ts);
-    if (diff.inMinutes < 2) return 'Just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} min ago';
-    if (diff.inHours < 24) return '${diff.inHours} hr ago';
-    if (diff.inDays < 7) return '${diff.inDays} days ago';
+    if (diff.inMinutes < 2) return l10n.timeJustNow;
+    if (diff.inMinutes < 60) return l10n.timeMinAgo(diff.inMinutes);
+    if (diff.inHours < 24) return l10n.timeHrAgo(diff.inHours);
+    if (diff.inDays < 7) return l10n.timeDaysAgo(diff.inDays);
     final weeks = (diff.inDays / 7).floor();
-    if (weeks < 5) return '$weeks weeks ago';
+    if (weeks < 5) return l10n.timeWeeksAgo(weeks);
     final months = (diff.inDays / 30).floor();
-    return '$months months ago';
+    return l10n.timeMonthsAgo(months);
   }
 }
 
@@ -1292,95 +1307,6 @@ class _ActivityRow extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-class _BottomNavBar extends StatelessWidget {
-  const _BottomNavBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      notchMargin: 8,
-      color: AppColors.surface,
-      elevation: 0,
-      child: SizedBox(
-        height: Dimensions.bottomNavHeight,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Spacing.lg,
-            vertical: Spacing.xs,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _BottomNavItem(
-                icon: Icons.home_filled,
-                label: 'Home',
-                isActive: true,
-                onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/driver-dashboard',
-                  (route) => route.isFirst,
-                ),
-              ),
-              _BottomNavItem(
-                icon: Icons.directions_car_filled,
-                label: 'Vehicles',
-                onTap: () => Navigator.of(context).pushNamed('/vehicles'),
-              ),
-              _BottomNavItem(
-                icon: Icons.handyman_outlined,
-                label: 'Service',
-                onTap: () {
-                  Navigator.of(context).pushNamed('/services');
-                },
-              ),
-              _BottomNavItem(
-                icon: Icons.people_alt_outlined,
-                label: 'Community',
-                onTap: () => Navigator.of(context).pushNamed('/community'),
-              ),
-              _BottomNavItem(
-                icon: Icons.menu_book_outlined,
-                label: 'Edu',
-                onTap: () => Navigator.of(context).pushNamed('/education'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _BottomNavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback? onTap;
-
-  const _BottomNavItem({
-    required this.icon,
-    required this.label,
-    this.isActive = false,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive ? AppColors.textPrimary : AppColors.textSecondary;
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: Spacing.xs),
-          Text(label, style: AppTextStyles.labelSmall.copyWith(color: color)),
-        ],
-      ),
     );
   }
 }
