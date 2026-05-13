@@ -170,6 +170,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguageAmharic => 'አማርኛ (Amharic)';
 
   @override
+  String get authLanguageChipEnglish => 'English';
+
+  @override
+  String get authLanguageChipAmharic => 'አማርኛ';
+
+  @override
   String get settingsChangePasswordTitle => 'Change Password';
 
   @override
@@ -537,6 +543,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapRequestOnsite => 'Request On-site Service';
+
+  @override
+  String get mapOnsiteLocationBody =>
+      'Turn on location access so we can send the garage your position for on-site service.';
+
+  @override
+  String get mapGarageDetailsTitle => 'Garage details';
+
+  @override
+  String get mapCloseTooltip => 'Close';
 
   @override
   String get vehDetailRemoved => 'Vehicle removed.';

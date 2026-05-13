@@ -86,9 +86,9 @@ class _SignupPageState extends State<SignupPage> {
     final l10n = AppLocalizations.of(context)!;
     final phoneNorm = normalizeEthiopiaPhone(_phoneController.text);
     if (phoneNorm == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.signupEnterValidPhoneOtp)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.signupEnterValidPhoneOtp)));
       return;
     }
 
@@ -102,7 +102,8 @@ class _SignupPageState extends State<SignupPage> {
         verificationCompleted: (credential) async {
           try {
             await FirebaseAuth.instance.signInWithCredential(credential);
-            final idToken = await FirebaseAuth.instance.currentUser?.getIdToken();
+            final idToken = await FirebaseAuth.instance.currentUser
+                ?.getIdToken();
             await FirebaseAuth.instance.signOut();
             if (!mounted) return;
             setState(() {
@@ -112,7 +113,11 @@ class _SignupPageState extends State<SignupPage> {
               _verifiedFirebaseIdToken = idToken;
             });
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(AppLocalizations.of(context)!.signupPhoneVerifiedAutomatic)),
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)!.signupPhoneVerifiedAutomatic,
+                ),
+              ),
             );
           } catch (_) {}
         },
@@ -134,7 +139,11 @@ class _SignupPageState extends State<SignupPage> {
             _verifiedFirebaseIdToken = null;
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.signupOtpSentCheckSms)),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.signupOtpSentCheckSms,
+              ),
+            ),
           );
         },
         codeAutoRetrievalTimeout: (verificationId) {
@@ -159,21 +168,21 @@ class _SignupPageState extends State<SignupPage> {
     final verificationId = _verificationId;
     final phoneNorm = normalizeEthiopiaPhone(_phoneController.text);
     if (verificationId == null || verificationId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.signupRequestOtpFirst)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.signupRequestOtpFirst)));
       return;
     }
     if (phoneNorm == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.signupEnterValidPhone)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.signupEnterValidPhone)));
       return;
     }
     if (code.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.signupEnterSixDigitOtp)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.signupEnterSixDigitOtp)));
       return;
     }
     setState(() => _verifyingOtp = true);
@@ -192,9 +201,9 @@ class _SignupPageState extends State<SignupPage> {
         _verifiedPhone = phoneNorm;
         _verifiedFirebaseIdToken = idToken;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.signupOtpVerifiedSuccess)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.signupOtpVerifiedSuccess)));
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -210,22 +219,22 @@ class _SignupPageState extends State<SignupPage> {
     final password = _passwordController.text;
     final confirm = _confirmPasswordController.text;
     if (password != confirm) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.signupPasswordsMismatch)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.signupPasswordsMismatch)));
       return;
     }
     if (password.length < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.signupPasswordMin8)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.signupPasswordMin8)));
       return;
     }
     final phoneNorm = normalizeEthiopiaPhone(_phoneController.text);
     if (phoneNorm == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.signupPhoneInvalidSnackbar)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.signupPhoneInvalidSnackbar)));
       return;
     }
     if (!_otpVerified || _verifiedPhone != phoneNorm) {
@@ -236,19 +245,21 @@ class _SignupPageState extends State<SignupPage> {
     }
     final firebaseIdToken = _verifiedFirebaseIdToken?.trim();
     if (firebaseIdToken == null || firebaseIdToken.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.signupFirebaseTokenMissing)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.signupFirebaseTokenMissing)));
       return;
     }
-    context.read<AuthBloc>().add(SignupRequested(
-          firstName: _firstNameController.text.trim(),
-          lastName: _lastNameController.text.trim(),
-          email: _emailController.text.trim(),
-          phone: phoneNorm,
-          password: password,
-          firebaseIdToken: firebaseIdToken,
-        ));
+    context.read<AuthBloc>().add(
+      SignupRequested(
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: phoneNorm,
+        password: password,
+        firebaseIdToken: firebaseIdToken,
+      ),
+    );
   }
 
   @override
@@ -259,24 +270,26 @@ class _SignupPageState extends State<SignupPage> {
           Navigator.of(context).pushReplacementNamed('/driver-dashboard');
         }
         if (state is AuthFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.surface,
         appBar: AppBar(
-          backgroundColor: AppColors.background,
+          backgroundColor: AppColors.surface,
           elevation: 0,
           scrolledUnderElevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary, size: 20),
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: AppColors.textPrimary,
+              size: 20,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          actions: [
-            AuthLanguageDropdown(),
-          ],
+          actions: [AuthLanguageDropdown()],
         ),
         body: SafeArea(
           child: SingleChildScrollView(
@@ -297,20 +310,26 @@ class _SignupPageState extends State<SignupPage> {
                     Text(
                       l10n.signupTitle,
                       textAlign: TextAlign.center,
-                      style: AppTextStyles.headlineMedium.copyWith(color: AppColors.textPrimary),
+                      style: AppTextStyles.headlineMedium.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                     const SizedBox(height: Spacing.xs),
                     Text(
                       l10n.signupSubtitle,
                       textAlign: TextAlign.center,
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                     const SizedBox(height: Spacing.xl),
                     Container(
                       padding: const EdgeInsets.all(Spacing.lg),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(BorderRadiusValues.xl),
+                        borderRadius: BorderRadius.circular(
+                          BorderRadiusValues.xl,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.shadow,
@@ -328,12 +347,17 @@ class _SignupPageState extends State<SignupPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(l10n.signupFirstName, style: AppTextStyles.labelMedium),
+                                    Text(
+                                      l10n.signupFirstName,
+                                      style: AppTextStyles.labelMedium,
+                                    ),
                                     const SizedBox(height: Spacing.xs),
                                     TextField(
                                       controller: _firstNameController,
                                       enabled: !isLoading,
-                                      decoration: InputDecoration(hintText: l10n.signupHintFirstName),
+                                      decoration: InputDecoration(
+                                        hintText: l10n.signupHintFirstName,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -343,12 +367,17 @@ class _SignupPageState extends State<SignupPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(l10n.signupLastName, style: AppTextStyles.labelMedium),
+                                    Text(
+                                      l10n.signupLastName,
+                                      style: AppTextStyles.labelMedium,
+                                    ),
                                     const SizedBox(height: Spacing.xs),
                                     TextField(
                                       controller: _lastNameController,
                                       enabled: !isLoading,
-                                      decoration: InputDecoration(hintText: l10n.signupHintLastName),
+                                      decoration: InputDecoration(
+                                        hintText: l10n.signupHintLastName,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -356,7 +385,10 @@ class _SignupPageState extends State<SignupPage> {
                             ],
                           ),
                           const SizedBox(height: Spacing.lg),
-                          Text(l10n.signupEmail, style: AppTextStyles.labelMedium),
+                          Text(
+                            l10n.signupEmail,
+                            style: AppTextStyles.labelMedium,
+                          ),
                           const SizedBox(height: Spacing.xs),
                           TextField(
                             controller: _emailController,
@@ -364,85 +396,116 @@ class _SignupPageState extends State<SignupPage> {
                             enabled: !isLoading,
                             decoration: InputDecoration(
                               hintText: l10n.signupEmailHint,
-                              prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textSecondary),
+                              prefixIcon: const Icon(
+                                Icons.email_outlined,
+                                color: AppColors.textSecondary,
+                              ),
                             ),
                           ),
                           const SizedBox(height: Spacing.lg),
-                          Text(l10n.signupPhoneLabel, style: AppTextStyles.labelMedium),
+                          Text(
+                            l10n.signupPhoneLabel,
+                            style: AppTextStyles.labelMedium,
+                          ),
                           const SizedBox(height: Spacing.xs),
                           TextField(
                             controller: _phoneController,
                             keyboardType: TextInputType.phone,
-                                      enabled: !busy,
-                            inputFormatters: const [EthiopiaPhoneInputFormatter()],
+                            enabled: !busy,
+                            inputFormatters: const [
+                              EthiopiaPhoneInputFormatter(),
+                            ],
                             decoration: InputDecoration(
                               hintText: l10n.signupPhoneHint,
-                              prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.textSecondary),
+                              prefixIcon: const Icon(
+                                Icons.phone_outlined,
+                                color: AppColors.textSecondary,
+                              ),
                             ),
                           ),
-                                    const SizedBox(height: Spacing.sm),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: OutlinedButton.icon(
-                                            onPressed: busy ? null : _sendOtp,
-                                            icon: _sendingOtp
-                                                ? const SizedBox(
-                                                    width: 16,
-                                                    height: 16,
-                                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                                  )
-                                                : const Icon(Icons.sms_outlined),
-                                            label: Text(_otpSent ? l10n.signupResendOtp : l10n.signupSendOtp),
+                          const SizedBox(height: Spacing.sm),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: busy ? null : _sendOtp,
+                                  icon: _sendingOtp
+                                      ? const SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
                                           ),
-                                        ),
-                                        const SizedBox(width: Spacing.sm),
-                                        if (_otpVerified)
-                                          const Icon(
-                                            Icons.verified_rounded,
-                                            color: Colors.green,
-                                          ),
-                                      ],
-                                    ),
-                                    if (_otpSent) ...[
-                                      const SizedBox(height: Spacing.md),
-                                      Text(l10n.signupOtpCodeLabel, style: AppTextStyles.labelMedium),
-                                      const SizedBox(height: Spacing.xs),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: TextField(
-                                              controller: _otpController,
-                                              keyboardType: TextInputType.number,
-                                              enabled: !busy && !_otpVerified,
-                                              decoration: InputDecoration(
-                                                hintText: l10n.signupOtpHint,
-                                                prefixIcon: Icon(
-                                                  Icons.password_outlined,
-                                                  color: AppColors.textSecondary,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: Spacing.sm),
-                                          SizedBox(
-                                            height: 48,
-                                            child: ElevatedButton(
-                                              onPressed: busy || _otpVerified ? null : _verifyOtp,
-                                              child: _verifyingOtp
-                                                  ? const SizedBox(
-                                                      width: 16,
-                                                      height: 16,
-                                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                                    )
-                                                  : Text(_otpVerified ? l10n.signupVerified : l10n.signupVerify),
-                                            ),
-                                          ),
-                                        ],
+                                        )
+                                      : const Icon(Icons.sms_outlined),
+                                  label: Text(
+                                    _otpSent
+                                        ? l10n.signupResendOtp
+                                        : l10n.signupSendOtp,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: Spacing.sm),
+                              if (_otpVerified)
+                                const Icon(
+                                  Icons.verified_rounded,
+                                  color: Colors.green,
+                                ),
+                            ],
+                          ),
+                          if (_otpSent) ...[
+                            const SizedBox(height: Spacing.md),
+                            Text(
+                              l10n.signupOtpCodeLabel,
+                              style: AppTextStyles.labelMedium,
+                            ),
+                            const SizedBox(height: Spacing.xs),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _otpController,
+                                    keyboardType: TextInputType.number,
+                                    enabled: !busy && !_otpVerified,
+                                    decoration: InputDecoration(
+                                      hintText: l10n.signupOtpHint,
+                                      prefixIcon: Icon(
+                                        Icons.password_outlined,
+                                        color: AppColors.textSecondary,
                                       ),
-                                    ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: Spacing.sm),
+                                SizedBox(
+                                  height: 48,
+                                  child: ElevatedButton(
+                                    onPressed: busy || _otpVerified
+                                        ? null
+                                        : _verifyOtp,
+                                    child: _verifyingOtp
+                                        ? const SizedBox(
+                                            width: 16,
+                                            height: 16,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : Text(
+                                            _otpVerified
+                                                ? l10n.signupVerified
+                                                : l10n.signupVerify,
+                                          ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                           const SizedBox(height: Spacing.lg),
-                          Text(l10n.signupPasswordLabel, style: AppTextStyles.labelMedium),
+                          Text(
+                            l10n.signupPasswordLabel,
+                            style: AppTextStyles.labelMedium,
+                          ),
                           const SizedBox(height: Spacing.xs),
                           TextField(
                             controller: _passwordController,
@@ -450,18 +513,28 @@ class _SignupPageState extends State<SignupPage> {
                             enabled: !isLoading,
                             decoration: InputDecoration(
                               hintText: l10n.signupPasswordHint,
-                              prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
+                              prefixIcon: const Icon(
+                                Icons.lock_outline,
+                                color: AppColors.textSecondary,
+                              ),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                  _obscurePassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
                                   color: AppColors.textSecondary,
                                 ),
-                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                onPressed: () => setState(
+                                  () => _obscurePassword = !_obscurePassword,
+                                ),
                               ),
                             ),
                           ),
                           const SizedBox(height: Spacing.lg),
-                          Text(l10n.signupConfirmPasswordLabel, style: AppTextStyles.labelMedium),
+                          Text(
+                            l10n.signupConfirmPasswordLabel,
+                            style: AppTextStyles.labelMedium,
+                          ),
                           const SizedBox(height: Spacing.xs),
                           TextField(
                             controller: _confirmPasswordController,
@@ -469,13 +542,20 @@ class _SignupPageState extends State<SignupPage> {
                             enabled: !isLoading,
                             decoration: InputDecoration(
                               hintText: l10n.signupConfirmPasswordHint,
-                              prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
+                              prefixIcon: const Icon(
+                                Icons.lock_outline,
+                                color: AppColors.textSecondary,
+                              ),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                  _obscureConfirm
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
                                   color: AppColors.textSecondary,
                                 ),
-                                onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                                onPressed: () => setState(
+                                  () => _obscureConfirm = !_obscureConfirm,
+                                ),
                               ),
                             ),
                           ),
@@ -489,7 +569,9 @@ class _SignupPageState extends State<SignupPage> {
                                 foregroundColor: AppColors.secondary,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(BorderRadiusValues.lg),
+                                  borderRadius: BorderRadius.circular(
+                                    BorderRadiusValues.lg,
+                                  ),
                                 ),
                               ),
                               child: isLoading
@@ -527,18 +609,16 @@ class _LogoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Container(
+      child: SizedBox(
         width: Dimensions.logoSize * 2,
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          border: Border.all(color: AppColors.surfaceMuted),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.sm),
-        child: AspectRatio(
-          aspectRatio: _logoAspectRatio,
-          child: Image.asset(
-            _logoAsset,
-            fit: BoxFit.contain,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Spacing.md,
+            vertical: Spacing.sm,
+          ),
+          child: AspectRatio(
+            aspectRatio: _logoAspectRatio,
+            child: Image.asset(_logoAsset, fit: BoxFit.contain),
           ),
         ),
       ),

@@ -404,6 +404,18 @@ abstract class AppLocalizations {
   /// **'አማርኛ (Amharic)'**
   String get settingsLanguageAmharic;
 
+  /// No description provided for @authLanguageChipEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get authLanguageChipEnglish;
+
+  /// No description provided for @authLanguageChipAmharic.
+  ///
+  /// In en, this message translates to:
+  /// **'አማርኛ'**
+  String get authLanguageChipAmharic;
+
   /// No description provided for @settingsChangePasswordTitle.
   ///
   /// In en, this message translates to:
@@ -1117,6 +1129,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Request On-site Service'**
   String get mapRequestOnsite;
+
+  /// No description provided for @mapOnsiteLocationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on location access so we can send the garage your position for on-site service.'**
+  String get mapOnsiteLocationBody;
+
+  /// No description provided for @mapGarageDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Garage details'**
+  String get mapGarageDetailsTitle;
+
+  /// No description provided for @mapCloseTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get mapCloseTooltip;
 
   /// No description provided for @vehDetailRemoved.
   ///

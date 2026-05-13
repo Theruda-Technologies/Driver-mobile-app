@@ -36,15 +36,14 @@ class _LoginPageState extends State<LoginPage> {
     final l10n = AppLocalizations.of(context)!;
     final normalized = normalizeEthiopiaPhone(_phoneController.text);
     if (normalized == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.loginPhoneInvalidSnackbar)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.loginPhoneInvalidSnackbar)));
       return;
     }
-    context.read<AuthBloc>().add(LoginRequested(
-          phone: normalized,
-          password: _passwordController.text,
-        ));
+    context.read<AuthBloc>().add(
+      LoginRequested(phone: normalized, password: _passwordController.text),
+    );
   }
 
   @override
@@ -55,13 +54,13 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.of(context).pushReplacementNamed('/driver-dashboard');
         }
         if (state is AuthFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.surface,
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
@@ -75,12 +74,7 @@ class _LoginPageState extends State<LoginPage> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      children: [
-                        const Spacer(),
-                        AuthLanguageDropdown(),
-                      ],
-                    ),
+                    Row(children: [const Spacer(), AuthLanguageDropdown()]),
                     const SizedBox(height: Spacing.md),
                     const SizedBox(height: Spacing.xxl),
                     const _LogoSection(),
@@ -105,7 +99,9 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.all(Spacing.lg),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(BorderRadiusValues.xl),
+                        borderRadius: BorderRadius.circular(
+                          BorderRadiusValues.xl,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.shadow,
@@ -117,20 +113,31 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(l10n.loginPhoneLabel, style: AppTextStyles.labelMedium),
+                          Text(
+                            l10n.loginPhoneLabel,
+                            style: AppTextStyles.labelMedium,
+                          ),
                           const SizedBox(height: Spacing.xs),
                           TextFormField(
                             controller: _phoneController,
                             keyboardType: TextInputType.phone,
                             enabled: !isLoading,
-                            inputFormatters: const [EthiopiaPhoneInputFormatter()],
+                            inputFormatters: const [
+                              EthiopiaPhoneInputFormatter(),
+                            ],
                             decoration: InputDecoration(
                               hintText: l10n.loginPhoneHint,
-                              prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.textSecondary),
+                              prefixIcon: const Icon(
+                                Icons.phone_outlined,
+                                color: AppColors.textSecondary,
+                              ),
                             ),
                           ),
                           const SizedBox(height: Spacing.lg),
-                          Text(l10n.loginPasswordLabel, style: AppTextStyles.labelMedium),
+                          Text(
+                            l10n.loginPasswordLabel,
+                            style: AppTextStyles.labelMedium,
+                          ),
                           const SizedBox(height: Spacing.xs),
                           TextFormField(
                             controller: _passwordController,
@@ -138,7 +145,10 @@ class _LoginPageState extends State<LoginPage> {
                             enabled: !isLoading,
                             decoration: InputDecoration(
                               hintText: l10n.loginPasswordHint,
-                              prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
+                              prefixIcon: const Icon(
+                                Icons.lock_outline,
+                                color: AppColors.textSecondary,
+                              ),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _obscurePassword
@@ -146,8 +156,9 @@ class _LoginPageState extends State<LoginPage> {
                                       : Icons.visibility_outlined,
                                   color: AppColors.textSecondary,
                                 ),
-                                onPressed: () =>
-                                    setState(() => _obscurePassword = !_obscurePassword),
+                                onPressed: () => setState(
+                                  () => _obscurePassword = !_obscurePassword,
+                                ),
                               ),
                             ),
                           ),
@@ -161,7 +172,9 @@ class _LoginPageState extends State<LoginPage> {
                                 foregroundColor: AppColors.secondary,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(BorderRadiusValues.lg),
+                                  borderRadius: BorderRadius.circular(
+                                    BorderRadiusValues.lg,
+                                  ),
                                 ),
                               ),
                               child: isLoading
@@ -185,7 +198,9 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Text(
                           l10n.loginNoAccountPrompt,
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                         GestureDetector(
                           onTap: () =>
@@ -220,18 +235,16 @@ class _LogoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Container(
+      child: SizedBox(
         width: Dimensions.logoSize * 2,
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          border: Border.all(color: AppColors.surfaceMuted),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: Spacing.md, vertical: Spacing.sm),
-        child: AspectRatio(
-          aspectRatio: _logoAspectRatio,
-          child: Image.asset(
-            _logoAsset,
-            fit: BoxFit.contain,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Spacing.md,
+            vertical: Spacing.sm,
+          ),
+          child: AspectRatio(
+            aspectRatio: _logoAspectRatio,
+            child: Image.asset(_logoAsset, fit: BoxFit.contain),
           ),
         ),
       ),

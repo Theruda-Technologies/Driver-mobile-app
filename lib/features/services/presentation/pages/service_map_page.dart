@@ -10,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -257,8 +258,9 @@ class _ServiceMapPageState extends State<ServiceMapPage> {
       return;
     }
     if (userLocation == null) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Location required to load nearby places')),
+        SnackBar(content: Text(l10n.mapLocationRequired)),
       );
       return;
     }
@@ -292,8 +294,9 @@ class _ServiceMapPageState extends State<ServiceMapPage> {
     LatLng? userLocation,
   ) {
     if (userLocation == null) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Current location is required for routing')),
+        SnackBar(content: Text(l10n.mapRoutingLocationRequired)),
       );
       return;
     }
@@ -308,9 +311,10 @@ class _ServiceMapPageState extends State<ServiceMapPage> {
   void _onMapTappedForRoute(LatLng destination, LatLng? userLocation) {
     _focusOnLatLng(destination);
     _getDirectionsToPlace(destination, userLocation);
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Route updated to tapped location'),
+      SnackBar(
+        content: Text(l10n.mapRouteUpdated),
         duration: Duration(seconds: 2),
       ),
     );
@@ -627,11 +631,10 @@ class _ServiceMapPageState extends State<ServiceMapPage> {
 
   void _onRequestOnSite(ServiceCenter center, LatLng? userLocation) {
     if (userLocation == null) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Turn on location access so we can send the garage your position for on-site service.',
-          ),
+        SnackBar(
+          content: Text(l10n.mapOnsiteLocationBody),
         ),
       );
       return;
@@ -666,9 +669,10 @@ class _ServiceMapPageState extends State<ServiceMapPage> {
         BlocListener<AppointmentsBloc, AppointmentsState>(
           listener: (context, state) {
             if (state is AppointmentActionSuccess) {
+              final l10n = AppLocalizations.of(context)!;
               ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Appointment booked successfully'),
+                  SnackBar(
+                    content: Text(l10n.mapApptBooked),
                   ),
               );
             }
@@ -703,9 +707,10 @@ class _ServiceMapPageState extends State<ServiceMapPage> {
                   ),
                 );
               } else {
+                final l10n = AppLocalizations.of(context)!;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Current location is required for routing'),
+                  SnackBar(
+                    content: Text(l10n.mapRoutingLocationRequired),
                   ),
                 );
               }
@@ -762,13 +767,14 @@ class _ServiceMapPageState extends State<ServiceMapPage> {
               );
             }
                   if (!mapState.locationResolved) {
-              return const Center(
+              final l10n = AppLocalizations.of(context)!;
+              return Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CircularProgressIndicator(),
                     SizedBox(height: Spacing.md),
-                    Text('Getting your location...'),
+                    Text(l10n.mapGettingLocation),
                   ],
                 ),
               );
@@ -2178,6 +2184,7 @@ class _SelectedCenterBottomSheet extends StatelessWidget {
       builder: (context, state) {
         final center = _getSelectedCenter(state);
         if (center == null) return const SizedBox.shrink();
+        final l10n = AppLocalizations.of(context)!;
 
         return Container(
             decoration: BoxDecoration(
@@ -2202,7 +2209,7 @@ class _SelectedCenterBottomSheet extends StatelessWidget {
                   const SizedBox(width: Spacing.lg),
                   Expanded(
                     child: Text(
-                      'Garage details',
+                      l10n.mapGarageDetailsTitle,
                       style: AppTextStyles.labelLarge.copyWith(
                     fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -2213,7 +2220,7 @@ class _SelectedCenterBottomSheet extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: onClose,
-                        tooltip: 'Close',
+                        tooltip: l10n.mapCloseTooltip,
                       ),
                   ],
                 ),
@@ -2252,6 +2259,7 @@ class _OverviewTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         Spacing.lg,
@@ -2292,7 +2300,7 @@ class _OverviewTab extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  center.isOpen ? 'Open' : 'Closed',
+                  center.isOpen ? l10n.svcOpen : l10n.svcClosed,
                   style: AppTextStyles.labelSmall.copyWith(
                     color: AppColors.textOnPrimary,
                     fontWeight: FontWeight.w600,
@@ -2314,7 +2322,7 @@ class _OverviewTab extends StatelessWidget {
               ),
               const SizedBox(width: Spacing.sm),
               Text(
-                '${center.reviewsCount} reviews',
+                l10n.svcReviewCount(center.reviewsCount),
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -2347,7 +2355,7 @@ class _OverviewTab extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => onNavigate(center),
                   icon: const Icon(Icons.directions, size: 20),
-                  label: const Text('Navigate'),
+                  label: Text(l10n.commonNavigate),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primary,
                     side: const BorderSide(color: AppColors.primary),
@@ -2362,7 +2370,7 @@ class _OverviewTab extends StatelessWidget {
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.secondary,
                   ),
-                  child: const Text('Book Appointment'),
+                  child: Text(l10n.mapBookAppointment),
                 ),
               ),
             ],
@@ -2374,7 +2382,7 @@ class _OverviewTab extends StatelessWidget {
               onPressed: (center.isOpen && center.onsiteServiceEnabled)
                   ? () => onRequestOnSite(center)
                   : null,
-              child: const Text('Request On-site Service'),
+              child: Text(l10n.mapRequestOnsite),
             ),
           ),
         ],

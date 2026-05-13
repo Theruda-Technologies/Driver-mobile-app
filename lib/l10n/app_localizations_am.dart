@@ -167,6 +167,12 @@ class AppLocalizationsAm extends AppLocalizations {
   String get settingsLanguageAmharic => 'አማርኛ';
 
   @override
+  String get authLanguageChipEnglish => 'እንግሊዝኛ';
+
+  @override
+  String get authLanguageChipAmharic => 'አማርኛ';
+
+  @override
   String get settingsChangePasswordTitle => 'የይለፍ ቃል ለውጥ';
 
   @override
@@ -527,6 +533,16 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get mapRequestOnsite => 'በቦታ ላይ አገልግሎት ይጠይቁ';
+
+  @override
+  String get mapOnsiteLocationBody =>
+      'በቦታ ላይ አገልግሎት ለመስጠት ቦታዎን ለጋራጅ እንድንልክ የቦታ መዳረሻን ያብሩ።';
+
+  @override
+  String get mapGarageDetailsTitle => 'የጋራጅ ዝርዝሮች';
+
+  @override
+  String get mapCloseTooltip => 'ዝጋ';
 
   @override
   String get vehDetailRemoved => 'ተሽከርካሪ ተወግዷል።';
