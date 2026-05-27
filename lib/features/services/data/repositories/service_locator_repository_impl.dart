@@ -2,6 +2,7 @@ library;
 
 import 'package:dio/dio.dart';
 
+import '../../../../core/network/api_error_messages.dart';
 import '../../domain/entities/service_center.dart';
 import '../../domain/errors/service_locator_failure.dart';
 import '../../domain/repositories/service_locator_repository.dart';
@@ -23,10 +24,12 @@ class ServiceLocatorRepositoryImpl implements ServiceLocatorRepository {
       );
       return list.map((m) => m.toEntity()).toList();
     } on DioException catch (e) {
-      final msg = e.response?.data is Map && e.response!.data['error'] != null
-          ? e.response!.data['error'].toString()
-          : 'Unable to load nearby garages.';
-      throw ServiceLocatorException(msg);
+      throw ServiceLocatorException(
+        ApiErrorMessages.from(
+          e,
+          fallback: 'Unable to load nearby garages.',
+        ),
+      );
     } catch (e) {
       throw ServiceLocatorException('Unable to load nearby garages.');
     }

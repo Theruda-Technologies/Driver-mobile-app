@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
+import '../../../../core/network/api_error_messages.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/service_locator.dart';
@@ -64,7 +65,10 @@ class _ScheduleMaintenancePageState extends State<ScheduleMaintenancePage> {
       if (!mounted) return;
       setState(() {
         _catalogLoading = false;
-        _catalogError = e.toString();
+        _catalogError = ApiErrorMessages.from(
+          e,
+          fallback: 'Could not load service types.',
+        );
       });
     }
   }
@@ -121,7 +125,7 @@ class _ScheduleMaintenancePageState extends State<ScheduleMaintenancePage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Could not load service types.\n$_catalogError',
+                              _catalogError!,
                               textAlign: TextAlign.center,
                               style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                             ),

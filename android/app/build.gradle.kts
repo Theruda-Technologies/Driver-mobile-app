@@ -54,3 +54,10 @@ android {
 flutter {
     source = "../.."
 }
+
+// `integration_test` is a dev_dependency: Flutter skips it on the release classpath
+// but `GeneratedPluginRegistrant` still references IntegrationTestPlugin, which
+// breaks `assembleRelease`. Link the plugin for release compiles only.
+dependencies {
+    releaseImplementation(project(":integration_test"))
+}

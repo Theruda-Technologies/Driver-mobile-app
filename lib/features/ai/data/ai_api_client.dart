@@ -27,8 +27,16 @@ class AiApiClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          // Option B (Supabase Auth -> RAG):
-          // Prefer explicit bearer token from `.env` (Supabase access token).
+          // Local RAG without JWT_SECRET: set AI_DEV_USER_ID=<driver-uuid> in .env
+          // (RAG accepts X-User-Id only when JWT_SECRET is unset on the Python server).
+          final devUserId = (dotenv.env['AI_DEV_USER_ID'] ?? '').trim();
+          if (kDebugMode && devUserId.isNotEmpty) {
+            options.headers['X-User-Id'] = devUserId;
+            options.headers.remove('Authorization');
+            return handler.next(options);
+          }
+
+          // Optional override (e.g. Supabase access token for hosted RAG).
           final envToken = (dotenv.env['AI_AUTH_BEARER_TOKEN'] ?? '').trim();
           if (_looksLikeJwt(envToken)) {
             options.headers['Authorization'] = 'Bearer $envToken';
@@ -40,7 +48,7 @@ class AiApiClient {
             );
           }
 
-          // Fallback: use app's stored auth token if present.
+          // Default: same JWT as driver-garage-backend login (required when RAG has JWT_SECRET).
           final token = await _authLocal.getToken();
           final trimmed = token?.trim() ?? '';
           if (trimmed.isNotEmpty) {
@@ -68,6 +76,7 @@ class AiApiClient {
   Future<Map<String, dynamic>> createSession({
     String? vehicleId,
     String? title,
+    Map<String, dynamic>? vehicleContext,
   }) async {
     final payload = <String, dynamic>{};
     if (vehicleId != null && vehicleId.trim().isNotEmpty) {
@@ -75,6 +84,9 @@ class AiApiClient {
     }
     if (title != null && title.trim().isNotEmpty) {
       payload['title'] = title.trim();
+    }
+    if (vehicleContext != null && vehicleContext.isNotEmpty) {
+      payload['vehicle_context'] = vehicleContext;
     }
     final res = await _dio.post<dynamic>('/sessions', data: payload);
     return _asJsonMap(res.data);
@@ -115,11 +127,15 @@ class AiApiClient {
     String sessionId, {
     required String message,
     String? vehicleId,
+    Map<String, dynamic>? vehicleContext,
   }) async {
     final payload = <String, dynamic>{'message': message};
     final v = vehicleId?.trim();
     if (v != null && v.isNotEmpty) {
       payload['vehicle_id'] = v;
+    }
+    if (vehicleContext != null && vehicleContext.isNotEmpty) {
+      payload['vehicle_context'] = vehicleContext;
     }
     final res = await _dio.post<dynamic>(
       '/sessions/$sessionId/messages',

@@ -1,7 +1,8 @@
 library;
 
 import 'package:bloc/bloc.dart';
-import 'package:dio/dio.dart';
+
+import '../../../../core/network/api_error_messages.dart';
 
 import '../../application/usecases/book_appointment_usecase.dart';
 import '../../application/usecases/cancel_appointment_usecase.dart';
@@ -96,13 +97,8 @@ class AppointmentsBloc extends Bloc<AppointmentsEvent, AppointmentsState> {
     }
   }
 
-  String _message(dynamic e) {
-    if (e is DioException) {
-      final data = e.response?.data;
-      if (data is Map && data['error'] != null) return data['error'].toString();
-    }
-    return e.toString().contains('SocketException') || e.toString().contains('Connection')
-        ? 'Network error.'
-        : 'Something went wrong.';
-  }
+  String _message(dynamic e) => ApiErrorMessages.from(
+        e,
+        feature: 'appointment',
+      );
 }

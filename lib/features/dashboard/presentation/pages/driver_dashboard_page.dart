@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
+import '../../../../core/network/api_error_messages.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/dimensions.dart';
@@ -388,7 +389,7 @@ class _VehicleHealthSection extends StatefulWidget {
 class _VehicleHealthSectionState extends State<_VehicleHealthSection> {
   VehicleHealth? _health;
   bool _loading = false;
-  Object? _error;
+  String? _error;
 
   Future<void> _load() async {
     final id = widget.selectedVehicleId?.trim();
@@ -418,7 +419,10 @@ class _VehicleHealthSectionState extends State<_VehicleHealthSection> {
       setState(() {
         _health = null;
         _loading = false;
-        _error = e;
+        _error = ApiErrorMessages.from(
+          e,
+          fallback: 'Could not load vehicle health.',
+        );
       });
     }
   }
@@ -487,7 +491,7 @@ class _VehicleHealthSectionState extends State<_VehicleHealthSection> {
             ),
             const SizedBox(height: Spacing.xs),
             Text(
-              _error.toString(),
+              _error!,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),

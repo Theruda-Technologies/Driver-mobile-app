@@ -17,6 +17,7 @@ import '../../../vehicles/presentation/bloc/vehicles_bloc.dart';
 import '../../../vehicles/presentation/bloc/vehicles_event.dart';
 import '../../../vehicles/presentation/bloc/vehicles_state.dart';
 import '../../domain/entities/service_center.dart';
+import '../../../../core/network/api_error_messages.dart';
 import '../../../../injection/service_locator.dart';
 import '../widgets/service_text_formatter.dart';
 
@@ -110,12 +111,15 @@ class _BookServiceWizardPageState extends State<BookServiceWizardPage> {
         _availabilitySlots = const [];
         _availabilityLoading = false;
       });
-      final message = (e.response?.data is Map &&
-              (e.response?.data as Map)['error'] != null)
-          ? (e.response?.data as Map)['error'].toString()
-          : 'Unable to load garage availability';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+        SnackBar(
+          content: Text(
+            ApiErrorMessages.from(
+              e,
+              fallback: 'Unable to load garage availability.',
+            ),
+          ),
+        ),
       );
     } catch (_) {
       if (!mounted) return;

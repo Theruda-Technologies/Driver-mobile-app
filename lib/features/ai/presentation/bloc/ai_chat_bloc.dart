@@ -3,6 +3,8 @@ library;
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/network/api_error_messages.dart';
+
 import '../../data/datasources/ai_chat_local_cache.dart';
 import '../../data/models/ai_message_model.dart';
 import '../../data/models/ai_session_model.dart';
@@ -50,31 +52,11 @@ class AiChatBloc extends Bloc<AiChatEvent, AiChatState> {
         s.contains('Network is unreachable');
   }
 
-  String _message(Object e) {
-    if (e is DioException) {
-      final code = e.response?.statusCode;
-      final data = e.response?.data;
-      if (code == 401 || code == 403) {
-        return 'AI service unauthorized. Use AI_AUTH_BEARER_TOKEN in .env if the AI API expects a different token than your app login, or sign in again.';
-      }
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.sendTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.connectionError) {
-        return 'AI server unreachable or timed out. If the service sleeps when idle, retry after ~30–60s.';
-      }
-      if (data is Map && data['error'] != null) {
-        return data['error'].toString();
-      }
-      if (data is Map && data['message'] != null) {
-        return data['message'].toString();
-      }
-      if (code != null) return 'AI request failed (HTTP $code).';
-    }
-    final s = e.toString();
-    if (s.length > 180) return 'AI request failed.';
-    return s;
-  }
+  String _message(Object e) => ApiErrorMessages.from(
+        e,
+        feature: 'AI chat',
+        fallback: 'Could not reach AI chat. Please try again.',
+      );
 
   Future<void> _onSessionsRequested(
     AiSessionsRequested event,
@@ -138,6 +120,7 @@ class AiChatBloc extends Bloc<AiChatEvent, AiChatState> {
       final session = await _repo.createSession(
         vehicleId: event.vehicleId,
         title: event.title,
+        vehicleContext: event.vehicleContext,
       );
       final sessions = <AiSessionModel>[
         session,
@@ -286,6 +269,7 @@ class AiChatBloc extends Bloc<AiChatEvent, AiChatState> {
         final s = await _repo.createSession(
           vehicleId: event.vehicleId,
           title: event.sessionTitle,
+          vehicleContext: event.vehicleContext,
         );
         sid = s.id;
         final sessions = <AiSessionModel>[
@@ -330,6 +314,7 @@ class AiChatBloc extends Bloc<AiChatEvent, AiChatState> {
         activeSid,
         message: text,
         vehicleId: event.vehicleId,
+        vehicleContext: event.vehicleContext,
       );
       var nextMessages = optimisticMessages;
       final assistant = result.assistantMessage;

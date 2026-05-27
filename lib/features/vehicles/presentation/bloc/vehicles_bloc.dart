@@ -3,6 +3,8 @@ library;
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 
+import '../../../../core/network/api_error_messages.dart';
+
 import '../../application/usecases/add_vehicle_usecase.dart';
 import '../../application/usecases/delete_vehicle_usecase.dart';
 import '../../application/usecases/get_vehicle_usecase.dart';
@@ -132,24 +134,9 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
     }
   }
 
-  String _message(dynamic e) {
-    if (e is DioException) {
-      final statusCode = e.response?.statusCode;
-      final data = e.response?.data;
-      if (data is Map && data['error'] != null) return data['error'].toString();
-      if (data is Map && data['message'] != null) return data['message'].toString();
-      if (statusCode != null) {
-        if (statusCode == 404) return 'Vehicles API not found (404). Backend may use /drivers/vehicles or /driver/vehicles.';
-        if (statusCode >= 500) return 'Server error ($statusCode). Try again later.';
-      }
-      final msg = e.message?.toString() ?? e.type.toString();
-      if (msg.isNotEmpty && msg != 'null') return msg;
-    }
-    final s = e.toString();
-    if (s.contains('SocketException') || s.contains('Connection') || s.contains('Failed host lookup')) {
-      return 'Cannot reach server. Check backend is running and base URL.';
-    }
-    if (s.length < 120) return s;
-    return 'Something went wrong.';
-  }
+  String _message(dynamic e) => ApiErrorMessages.from(
+        e,
+        feature: 'vehicle',
+        fallback: 'Could not update your vehicle. Please try again.',
+      );
 }

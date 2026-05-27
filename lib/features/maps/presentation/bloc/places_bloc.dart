@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/network/api_error_messages.dart';
+
 import '../../domain/entities/place_prediction.dart';
 import '../../domain/repositories/places_repository.dart';
 import 'places_event.dart';
@@ -77,8 +79,9 @@ class PlacesBloc extends Bloc<PlacesEvent, PlacesState> {
         }
       } catch (e, _) {
         if (!isClosed) {
-          final message = e is Exception ? e.toString().replaceFirst('Exception: ', '') : 'Search failed';
-          add(_SearchFailed(message));
+          add(_SearchFailed(
+            ApiErrorMessages.from(e, fallback: 'Search failed. Please try again.'),
+          ));
         }
       }
     });

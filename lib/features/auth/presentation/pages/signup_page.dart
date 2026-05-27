@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import '../../../../core/network/api_error_messages.dart';
 import '../../../../core/utils/ethiopia_phone.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -155,7 +156,11 @@ class _SignupPageState extends State<SignupPage> {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.signupOtpSetupFailed(e.toString()))),
+        SnackBar(
+          content: Text(
+            ApiErrorMessages.from(e, fallback: l10n.signupFailedSendOtp),
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => _sendingOtp = false);

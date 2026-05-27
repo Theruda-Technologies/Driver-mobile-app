@@ -1,8 +1,8 @@
 library;
 
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/network/api_error_messages.dart';
 import '../../application/usecases/create_history_usecase.dart';
 import '../../application/usecases/create_upcoming_usecase.dart';
 import '../../application/usecases/delete_history_usecase.dart';
@@ -274,14 +274,8 @@ class MaintenanceBloc extends Bloc<MaintenanceEvent, MaintenanceState> {
     }
   }
 
-  String _message(dynamic e) {
-    if (e is DioException) {
-      final data = e.response?.data;
-      if (data is Map && data['error'] != null) return data['error'].toString();
-      final code = e.response?.statusCode;
-      if (code != null) return 'Request failed ($code)';
-      return e.message?.toString() ?? 'Request failed';
-    }
-    return e.toString();
-  }
+  String _message(dynamic e) => ApiErrorMessages.from(
+        e,
+        feature: 'maintenance',
+      );
 }

@@ -9,7 +9,10 @@ import '../../../../core/constants/spacing.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/service_locator.dart';
+import '../../data/ai_vehicle_context_payload.dart';
 import '../../data/models/ai_message_model.dart';
+import '../../../maintenance/application/usecases/get_vehicle_health_usecase.dart';
+import '../../../maintenance/domain/entities/vehicle_health.dart';
 import '../bloc/ai_chat_bloc.dart';
 import '../bloc/ai_chat_event.dart';
 import '../bloc/ai_chat_state.dart';
@@ -19,11 +22,7 @@ import '../../../vehicles/presentation/bloc/vehicles_event.dart';
 import '../../../vehicles/presentation/bloc/vehicles_state.dart';
 
 class AiChatPage extends StatelessWidget {
-  const AiChatPage({
-    super.key,
-    this.initialSessionId,
-    this.initialVehicleId,
-  });
+  const AiChatPage({super.key, this.initialSessionId, this.initialVehicleId});
 
   final String? initialSessionId;
   final String? initialVehicleId;
@@ -85,29 +84,49 @@ class _AiChatViewState extends State<_AiChatView> {
     }
   }
 
-  void _send() {
+  Future<VehicleHealth?> _loadHealthForVehicle(String vehicleId) async {
+    try {
+      return await getIt<GetVehicleHealthUseCase>()(vehicleId);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> _vehicleContextFor(Vehicle? vehicle) async {
+    if (vehicle == null) return null;
+    final health = await _loadHealthForVehicle(vehicle.id);
+    return buildAiVehicleContextPayload(vehicle: vehicle, health: health);
+  }
+
+  Future<void> _send() async {
     final text = _inputController.text.trim();
     if (text.isEmpty) return;
     _inputController.clear();
     final selectedVehicle = _currentSelectedVehicle(context);
     final sessionTitle = _buildUniqueSessionTitle(selectedVehicle);
+    final vehicleContext = await _vehicleContextFor(selectedVehicle);
+    if (!mounted) return;
     context.read<AiChatBloc>().add(
       AiMessageSendRequested(
         text,
         vehicleId: selectedVehicle?.id,
         sessionTitle: sessionTitle,
+        vehicleContext: vehicleContext,
       ),
     );
     _scrollToBottom();
   }
 
-  void _startNewChat() {
+  Future<void> _startNewChat() async {
     final selectedVehicle = _currentSelectedVehicle(context);
     final sessionTitle = _buildUniqueSessionTitle(selectedVehicle);
+    final vehicleContext = await _vehicleContextFor(selectedVehicle);
+    if (!mounted) return;
     context.read<AiChatBloc>().add(
       AiStartSessionRequested(
         vehicleId: selectedVehicle?.id,
         title: sessionTitle,
+        vehicleContext: vehicleContext,
       ),
     );
   }
@@ -247,12 +266,12 @@ class _AiChatViewState extends State<_AiChatView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('AI Assistant'),
                 if (selectedVehicle != null)
                   Text(
                     selectedVehicle.displayName,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
               ],

@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
+import '../../../../core/network/api_error_messages.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -759,10 +760,10 @@ class _AppointmentCardFromEntity extends StatelessWidget {
         );
       } catch (_) {}
     } on DioException catch (e) {
-      final data = e.response?.data;
-      final msg = (data is Map && data['error'] != null)
-          ? data['error'].toString()
-          : l10n.svcUnableSubmitRating;
+      final msg = ApiErrorMessages.from(
+        e,
+        fallback: l10n.svcUnableSubmitRating,
+      );
       messenger.showSnackBar(
         SnackBar(content: Text(msg), backgroundColor: AppColors.danger),
       );

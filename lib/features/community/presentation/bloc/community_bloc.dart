@@ -1,7 +1,8 @@
 library;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dio/dio.dart';
+
+import '../../../../core/network/api_error_messages.dart';
 
 import '../../domain/entities/post.dart';
 import '../../application/usecases/create_post_comment_usecase.dart';
@@ -287,17 +288,8 @@ class CommunityBloc extends Bloc<CommunityEvent, CommunityState> {
     );
   }
 
-  String _message(dynamic e) {
-    if (e is DioException) {
-      final data = e.response?.data;
-      if (data is Map && data['error'] != null) return data['error'].toString();
-      if (data is Map && data['message'] != null) {
-        return data['message'].toString();
-      }
-      return e.message?.toString() ?? 'Request failed';
-    }
-    final s = e.toString();
-    if (s.length < 140) return s;
-    return 'Something went wrong.';
-  }
+  String _message(dynamic e) => ApiErrorMessages.from(
+        e,
+        feature: 'community post',
+      );
 }

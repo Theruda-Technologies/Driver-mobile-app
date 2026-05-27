@@ -1,31 +1,29 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// Basic unit tests for shared utilities. End-to-end flows live in
+// `integration_test/` and run on a real device or emulator.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:driver/main.dart';
-import 'package:shimmer/main.dart';
+import 'package:driver/core/utils/ethiopia_phone.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('normalizeEthiopiaPhone', () {
+    test('accepts 09… local format and returns +251 E.164', () {
+      expect(normalizeEthiopiaPhone('0912345678'), '+251912345678');
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    test('accepts 251… and 9-digit raw mobile numbers', () {
+      expect(normalizeEthiopiaPhone('251912345678'), '+251912345678');
+      expect(normalizeEthiopiaPhone('912345678'), '+251912345678');
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    test('accepts +251 E.164 unchanged', () {
+      expect(normalizeEthiopiaPhone('+251912345678'), '+251912345678');
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    test('rejects empty or clearly invalid input', () {
+      expect(normalizeEthiopiaPhone(''), isNull);
+      expect(normalizeEthiopiaPhone('abc'), isNull);
+      expect(normalizeEthiopiaPhone('123'), isNull);
+    });
   });
 }

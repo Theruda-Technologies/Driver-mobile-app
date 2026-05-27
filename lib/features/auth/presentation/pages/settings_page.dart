@@ -1,12 +1,12 @@
 library;
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/locale/app_locale_data.dart';
+import '../../../../core/network/api_error_messages.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_drawer.dart';
@@ -62,29 +62,21 @@ class _SettingsPageState extends State<SettingsPage> {
       );
     } catch (e) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_message(e, AppLocalizations.of(context)!)),
+          content: Text(
+            ApiErrorMessages.from(
+              e,
+              fallback: l10n.settingsUnableChangePassword,
+            ),
+          ),
           backgroundColor: AppColors.danger,
         ),
       );
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
-  }
-
-  String _message(Object e, AppLocalizations l10n) {
-    if (e is DioException) {
-      final data = e.response?.data;
-      if (data is Map && data['error'] != null) return data['error'].toString();
-      if (data is Map && data['message'] != null) {
-        return data['message'].toString();
-      }
-      return e.message ?? l10n.settingsRequestFailed;
-    }
-    final text = e.toString();
-    if (text.length < 140) return text;
-    return l10n.settingsUnableChangePassword;
   }
 
   @override

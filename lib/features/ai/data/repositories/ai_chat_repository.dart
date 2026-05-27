@@ -23,8 +23,13 @@ class AiChatRepository {
   Future<AiSessionModel> createSession({
     String? vehicleId,
     String? title,
+    Map<String, dynamic>? vehicleContext,
   }) async {
-    final json = await _api.createSession(vehicleId: vehicleId, title: title);
+    final json = await _api.createSession(
+      vehicleId: vehicleId,
+      title: title,
+      vehicleContext: vehicleContext,
+    );
     return AiSessionModel.fromJson(json);
   }
 
@@ -46,11 +51,13 @@ class AiChatRepository {
     String sessionId, {
     required String message,
     String? vehicleId,
+    Map<String, dynamic>? vehicleContext,
   }) async {
     final json = await _api.sendMessage(
       sessionId,
       message: message,
       vehicleId: vehicleId,
+      vehicleContext: vehicleContext,
     );
 
     AiSessionModel? session;

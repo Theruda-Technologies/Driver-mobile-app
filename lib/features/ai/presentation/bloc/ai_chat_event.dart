@@ -26,13 +26,15 @@ class AiStartSessionRequested extends AiChatEvent {
   const AiStartSessionRequested({
     this.vehicleId,
     this.title,
+    this.vehicleContext,
   });
 
   final String? vehicleId;
   final String? title;
+  final Map<String, dynamic>? vehicleContext;
 
   @override
-  List<Object?> get props => [vehicleId, title];
+  List<Object?> get props => [vehicleId, title, vehicleContext];
 }
 
 class AiMessagesRequested extends AiChatEvent {
@@ -66,12 +68,14 @@ class AiMessageSendRequested extends AiChatEvent {
     this.message, {
     this.vehicleId,
     this.sessionTitle,
+    this.vehicleContext,
   });
 
   final String message;
   final String? vehicleId;
   final String? sessionTitle;
+  final Map<String, dynamic>? vehicleContext;
 
   @override
-  List<Object?> get props => [message, vehicleId, sessionTitle];
+  List<Object?> get props => [message, vehicleId, sessionTitle, vehicleContext];
 }
