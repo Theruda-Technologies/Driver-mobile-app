@@ -2204,11 +2204,23 @@ abstract class AppLocalizations {
   /// **'Open'**
   String get svcOpen;
 
+  /// No description provided for @svcBookAhead.
+  ///
+  /// In en, this message translates to:
+  /// **'Book ahead'**
+  String get svcBookAhead;
+
   /// No description provided for @svcClosed.
   ///
   /// In en, this message translates to:
   /// **'Closed'**
   String get svcClosed;
+
+  /// No description provided for @svcOnsiteAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'On-site service available'**
+  String get svcOnsiteAvailable;
 
   /// No description provided for @svcViewReviews.
   ///

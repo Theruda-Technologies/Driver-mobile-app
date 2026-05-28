@@ -34,6 +34,7 @@ import '../bloc/service_locator_bloc.dart';
 import '../bloc/service_locator_event.dart';
 import '../bloc/service_locator_state.dart';
 import 'book_service_wizard_page.dart';
+import '../widgets/garage_status_display.dart';
 import '../widgets/service_tag_chip.dart';
 
 /// Default fallback when location is unavailable (San Francisco).
@@ -2298,27 +2299,21 @@ class _OverviewTab extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: Spacing.md,
-                  vertical: Spacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: center.isOpen ? AppColors.success : AppColors.danger,
-                  borderRadius: BorderRadius.circular(
-                    BorderRadiusValues.circular,
-                  ),
-                ),
-                child: Text(
-                  center.isOpen ? l10n.svcOpen : l10n.svcClosed,
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.textOnPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+              GarageStatusChip(center: center),
             ],
           ),
+          if (center.onsiteServiceEnabled) ...[
+            const SizedBox(height: Spacing.xs),
+            Text(
+              l10n.svcOnsiteAvailable,
+              style: AppTextStyles.labelSmall.copyWith(
+                color: center.canRequestOnsite
+                    ? AppColors.success
+                    : AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
           const SizedBox(height: Spacing.sm),
           Row(
             children: [
@@ -2373,7 +2368,9 @@ class _OverviewTab extends StatelessWidget {
               const SizedBox(width: Spacing.md),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: center.isRegistered ? () => onBook(center) : null,
+                  onPressed: center.acceptsBookings && center.isRegistered
+                      ? () => onBook(center)
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.secondary,
@@ -2387,7 +2384,7 @@ class _OverviewTab extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: (center.isOpen && center.onsiteServiceEnabled)
+              onPressed: center.canRequestOnsite
                   ? () => onRequestOnSite(center)
                   : null,
               child: Text(l10n.mapRequestOnsite),

@@ -1,5 +1,7 @@
 library;
 
+import 'dart:typed_data';
+
 import '../../domain/entities/education_article.dart';
 import '../../domain/repositories/education_repository.dart';
 import '../datasources/education_remote_datasource.dart';
@@ -26,4 +28,8 @@ class EducationRepositoryImpl implements EducationRepository {
     final m = await _remote.getById(id);
     return m.toEntity();
   }
+
+  @override
+  Future<Uint8List?> fetchArticleImage(String articleId) =>
+      _remote.fetchArticleImageBytes(articleId);
 }

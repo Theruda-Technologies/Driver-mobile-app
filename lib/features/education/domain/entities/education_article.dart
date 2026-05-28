@@ -37,7 +37,7 @@ class EducationArticle extends Equatable {
     required this.title,
     required this.description,
     required this.category,
-    this.imageUrl,
+    this.hasImage = false,
     this.manualUrl,
     required this.createdAt,
     required this.updatedAt,
@@ -47,7 +47,7 @@ class EducationArticle extends Equatable {
   final String title;
   final String description;
   final EducationCategory category;
-  final String? imageUrl;
+  final bool hasImage;
   final String? manualUrl;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -84,5 +84,5 @@ class EducationArticle extends Equatable {
 
   @override
   List<Object?> get props =>
-      [id, title, description, category, imageUrl, manualUrl, createdAt, updatedAt];
+      [id, title, description, category, hasImage, manualUrl, createdAt, updatedAt];
 }

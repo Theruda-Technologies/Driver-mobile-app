@@ -7,4 +7,10 @@ abstract class ServiceLocatorRemoteDataSource {
     double? latitude,
     double? longitude,
   });
+
+  /// Same enrichment as list cards: profile + nearby seed (onsite, hours).
+  Future<ServiceCenterModel> enrichGarage(
+    String garageId,
+    Map<String, dynamic> seed,
+  );
 }

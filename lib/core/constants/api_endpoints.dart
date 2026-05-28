@@ -38,6 +38,8 @@ class ApiEndpoints {
   // ----- Driver Education (prefix: /driver/education, JWT) -----
   static const String driverEducation = '/driver/education';
   static String driverEducationById(String id) => '/driver/education/$id';
+  static String driverEducationImage(String id) => '/driver/education/$id/image';
+  static String driverEducationPdf(String id) => '/driver/education/$id/pdf';
   static const String driverEducationSearch = '/driver/education/search';
   static const String educationContent = '/education/content';
   static String educationContentById(String id) => '/education/content/$id';
@@ -74,6 +76,12 @@ class ApiEndpoints {
   static const String nearbyServices = '/services/nearby';
   static String garageAvailabilitySlots(String garageId) =>
       '/garages/availability/$garageId/slots';
+
+  /// Driver: full garage profile (services, availabilitySlots, optional setting).
+  static String garageProfile(String garageId) => '/garages/$garageId/profile';
+
+  /// Driver: services offered by a garage.
+  static String garageServices(String garageId) => '/garages/$garageId/services';
   static const String notifications = '/notifications';
   static String garageRatingSummary(String garageId) =>
       '/garages/ratings/$garageId/summary';

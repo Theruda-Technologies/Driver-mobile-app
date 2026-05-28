@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dio/dio.dart';
 
-import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/constants/border_radius.dart';
 import '../../../../core/constants/spacing.dart';
 import '../../../../core/network/api_client.dart';
@@ -17,11 +17,31 @@ import '../../../vehicles/presentation/bloc/vehicles_bloc.dart';
 import '../../../vehicles/presentation/bloc/vehicles_event.dart';
 import '../../../vehicles/presentation/bloc/vehicles_state.dart';
 import '../../domain/entities/service_center.dart';
+import '../../domain/utils/garage_open_status.dart';
+import '../../data/datasources/garage_profile_remote_datasource.dart';
+import '../../data/models/garage_availability_parser.dart';
 import '../../../../core/network/api_error_messages.dart';
 import '../../../../injection/service_locator.dart';
 import '../widgets/service_text_formatter.dart';
 
 import 'service_locator_page.dart';
+
+Map<String, dynamic> _profileSeedFromCenter(ServiceCenter center) {
+  return {
+    if (center.onsiteServiceEnabled) 'onsiteServiceEnabled': true,
+    if (center.isRegistered) 'isRegistered': true,
+    if (center.availabilitySlots.isNotEmpty)
+      'availabilitySlots': center.availabilitySlots
+          .map(
+            (s) => <String, dynamic>{
+              'dayOfWeek': s.dayOfWeek,
+              'startMinute': s.startMinute,
+              'endMinute': s.endMinute,
+            },
+          )
+          .toList(),
+  };
+}
 
 class BookServiceWizardPage extends StatefulWidget {
   const BookServiceWizardPage({
@@ -53,7 +73,9 @@ class _BookServiceWizardPageState extends State<BookServiceWizardPage> {
   _WizardStep _step = _WizardStep.selectVehicle;
   late final AppointmentsBloc _appointmentsBloc;
   late final VehiclesBloc _vehiclesBloc;
-  late final ApiClient _apiClient;
+  late final GarageProfileRemoteDataSource _garageProfileSource;
+
+  late ServiceCenter _center;
 
   bool _isBooking = false;
   Appointment? _bookedAppointment;
@@ -76,67 +98,62 @@ class _BookServiceWizardPageState extends State<BookServiceWizardPage> {
     _appointmentsBloc = getIt<AppointmentsBloc>()
       ..add(const AppointmentsLoadRequested());
     _vehiclesBloc = getIt<VehiclesBloc>()..add(const VehiclesLoadRequested());
-    _apiClient = getIt<ApiClient>();
-    _fetchGarageAvailability();
+    _garageProfileSource = GarageProfileRemoteDataSourceImpl(getIt<ApiClient>().dio);
+    _center = widget.center;
+    if (_center.availabilitySlots.isNotEmpty) {
+      _availabilitySlots = List<GarageAvailabilitySlot>.from(_center.availabilitySlots);
+      _availabilityLoading = false;
+    }
+    _loadGarageProfile();
   }
 
-  Future<void> _fetchGarageAvailability() async {
+  Future<void> _loadGarageProfile() async {
     setState(() => _availabilityLoading = true);
     try {
-      final res = await _apiClient.dio.get<List<dynamic>>(
-        ApiEndpoints.garageAvailabilitySlots(widget.center.id),
+      final profile = await _garageProfileSource.fetchForDriver(
+        _center.id,
+        seed: _profileSeedFromCenter(_center),
       );
-      final data = res.data ?? const [];
-      final slots = data
-          .whereType<Map>()
-          .map((e) => Map<String, dynamic>.from(e))
-          .map(
-            (json) => GarageAvailabilitySlot(
-              dayOfWeek: json['dayOfWeek']?.toString() ?? 'MONDAY',
-              startMinute: _toInt(json['startMinute']),
-              endMinute: _toInt(json['endMinute']),
-            ),
-          )
-          .where((s) => s.endMinute > s.startMinute)
-          .toList();
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print(
+          '[garageProfile] id=${_center.id} slots=${profile.availabilitySlots.map((s) => '${s.dayOfWeek}:${s.startMinute}-${s.endMinute}').join(', ')} onsite=${profile.onsiteServiceEnabled}',
+        );
+      }
 
       if (!mounted) return;
       setState(() {
-        _availabilitySlots = slots;
+        _center = _center.copyWith(
+          services: profile.services.isNotEmpty ? profile.services : _center.services,
+          availabilitySlots: profile.availabilitySlots,
+          isOpen: profile.availabilitySlots.isNotEmpty &&
+              GarageOpenStatus.isOpenNow(profile.availabilitySlots),
+          onsiteServiceEnabled:
+              profile.onsiteServiceEnabled || _center.onsiteServiceEnabled,
+        );
+        _availabilitySlots = profile.availabilitySlots;
         _availabilityLoading = false;
       });
     } on DioException catch (e) {
       if (!mounted) return;
-      setState(() {
-        _availabilitySlots = const [];
-        _availabilityLoading = false;
-      });
+      setState(() => _availabilityLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             ApiErrorMessages.from(
               e,
-              fallback: 'Unable to load garage availability.',
+              fallback: 'Unable to load garage profile.',
             ),
           ),
         ),
       );
     } catch (_) {
       if (!mounted) return;
-      setState(() {
-        _availabilitySlots = const [];
-        _availabilityLoading = false;
-      });
+      setState(() => _availabilityLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to load garage availability')),
+        const SnackBar(content: Text('Unable to load garage profile')),
       );
     }
-  }
-
-  int _toInt(dynamic v) {
-    if (v is int) return v;
-    if (v is double) return v.toInt();
-    return int.tryParse(v?.toString() ?? '') ?? 0;
   }
 
   @override
@@ -298,21 +315,26 @@ class _BookServiceWizardPageState extends State<BookServiceWizardPage> {
 
     final date = _selectedDate!;
     final time = _selectedTime!;
-    final scheduledAt = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    // Backend validates scheduledAt using UTC minutes (availability-booking.util).
+    final scheduledAt = GarageAvailabilityParser.scheduledAtUtc(
+      date: date,
+      hour: time.hour,
+      minute: time.minute,
+    );
     final orderedIds = _orderedSelectedGarageServiceIds();
     final namesInOrder = <String>[];
-    for (final o in widget.center.services) {
+    for (final o in _center.services) {
       if (orderedIds.contains(o.id)) namesInOrder.add(o.name);
     }
     final description = namesInOrder.isNotEmpty
         ? namesInOrder.join(', ')
-        : (widget.center.services.firstOrNull?.name ?? 'Service').trim();
+        : (_center.services.firstOrNull?.name ?? 'Service').trim();
 
     if (_isBooking) return;
     setState(() => _isBooking = true);
     _appointmentsBloc.add(
           AppointmentBookRequested(
-            garageId: widget.center.id,
+            garageId: _center.id,
             vehicleId: _selectedVehicleId!,
             scheduledAt: scheduledAt,
             serviceDescription: description,
@@ -327,7 +349,7 @@ class _BookServiceWizardPageState extends State<BookServiceWizardPage> {
   /// Preserves garage list order; matches driver-garage-backend `garageServiceIds`.
   List<String> _orderedSelectedGarageServiceIds() {
     final out = <String>[];
-    for (final o in widget.center.services) {
+    for (final o in _center.services) {
       if (o.canBookWithApi && _selectedGarageServiceIds.contains(o.id)) {
         out.add(o.id);
       }
@@ -453,7 +475,7 @@ class _BookServiceWizardPageState extends State<BookServiceWizardPage> {
   }
 
   Widget _SelectServicesStep() {
-    final services = widget.center.services;
+    final services = _center.services;
     final bookable = services.where((o) => o.canBookWithApi).toList();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.lg),
@@ -672,7 +694,25 @@ class _BookServiceWizardPageState extends State<BookServiceWizardPage> {
             Padding(
               padding: const EdgeInsets.only(top: Spacing.xs),
               child: Text(
-                'Available: ${_formatTimeOfDay(timeSlots.first)} – ${_formatTimeOfDay(timeSlots.last)}',
+                () {
+                  final range = GarageAvailabilityParser.availabilityRangeForDate(
+                    _selectedDate!,
+                    _availabilitySlots,
+                  );
+                  if (range == null) {
+                    return 'Available: ${_formatTimeOfDay(timeSlots.first)} – ${_formatTimeOfDay(timeSlots.last)}';
+                  }
+                  TimeOfDay asTime(int minute) {
+                    if (minute >= 1440) {
+                      return const TimeOfDay(hour: 23, minute: 59);
+                    }
+                    return TimeOfDay(hour: minute ~/ 60, minute: minute % 60);
+                  }
+                  if (range.endMinute >= 1440 && range.startMinute == 0) {
+                    return 'Available: 24 hours';
+                  }
+                  return 'Available: ${_formatTimeOfDay(asTime(range.startMinute))} – ${_formatTimeOfDay(asTime(range.endMinute))}';
+                }(),
                 style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
               ),
             ),
@@ -767,60 +807,13 @@ class _BookServiceWizardPageState extends State<BookServiceWizardPage> {
   }
 
   bool _isDateAvailable(DateTime date) {
-    final slots = _availabilitySlots;
-    if (slots.isEmpty) return false;
-    final day = _dayName(date.weekday);
-    return slots.any((s) => s.dayOfWeek.toUpperCase() == day && s.endMinute > s.startMinute);
+    return GarageAvailabilityParser.isDateAvailable(date, _availabilitySlots);
   }
 
   List<TimeOfDay> _timeSlotsForDate(DateTime date) {
-    final slots = _availabilitySlots;
-    if (slots.isEmpty) return const [];
-    final day = _dayName(date.weekday);
-    final daySlots = slots
-        .where((s) => s.dayOfWeek.toUpperCase() == day && s.endMinute > s.startMinute)
+    return GarageAvailabilityParser.timeSlotsForDate(date, _availabilitySlots)
+        .map((t) => TimeOfDay(hour: t.hour, minute: t.minute))
         .toList();
-    if (daySlots.isEmpty) return const [];
-
-    final times = <TimeOfDay>[];
-    for (final s in daySlots) {
-      // 60-minute slots aligned to hour.
-      int minute = s.startMinute;
-      while (minute + 60 <= s.endMinute) {
-        final h = minute ~/ 60;
-        final m = minute % 60;
-        times.add(TimeOfDay(hour: h, minute: m));
-        minute += 60;
-      }
-    }
-    // Deduplicate.
-    final uniq = <String, TimeOfDay>{};
-    for (final t in times) {
-      uniq['${t.hour}:${t.minute}'] = t;
-    }
-    final out = uniq.values.toList()
-      ..sort((a, b) => (a.hour * 60 + a.minute).compareTo(b.hour * 60 + b.minute));
-    return out;
-  }
-
-  String _dayName(int weekday) {
-    switch (weekday) {
-      case DateTime.monday:
-        return 'MONDAY';
-      case DateTime.tuesday:
-        return 'TUESDAY';
-      case DateTime.wednesday:
-        return 'WEDNESDAY';
-      case DateTime.thursday:
-        return 'THURSDAY';
-      case DateTime.friday:
-        return 'FRIDAY';
-      case DateTime.saturday:
-        return 'SATURDAY';
-      case DateTime.sunday:
-      default:
-        return 'SUNDAY';
-    }
   }
 }
 

@@ -27,6 +27,7 @@ import '../bloc/service_locator_event.dart';
 import '../bloc/service_locator_state.dart';
 import 'book_service_wizard_page.dart';
 import '../widgets/service_tag_chip.dart';
+import '../widgets/garage_center_card_footer.dart';
 import '../widgets/service_text_formatter.dart';
 
 enum _SvcLocIssue { servicesDisabled, permissionForever, permissionDenied, fetchFailed }
@@ -991,15 +992,7 @@ class _NearbyCenterCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: Spacing.xs),
-                    Text(
-                      center.isOpen ? l10n.svcOpen : l10n.svcClosed,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: center.isOpen
-                            ? AppColors.success
-                            : AppColors.textSecondary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    GarageCenterStatusRow(center: center),
                     const SizedBox(height: Spacing.xs),
                     Row(
                       children: [
@@ -1066,62 +1059,68 @@ class _NearbyCenterCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: Spacing.md),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => BookServiceWizardPage(center: center),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.calendar_today_outlined, size: 18),
-                  label: Text(AppLocalizations.of(context)!.svcBook),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.secondary,
-                    foregroundColor: AppColors.textOnPrimary,
-                    padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
-                  ),
+          GarageCenterCardFooter(
+            center: center,
+            onBook: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => BookServiceWizardPage(center: center),
                 ),
-              ),
-              const SizedBox(width: Spacing.sm),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => _callCenter(context, center.phone),
-                  icon: const Icon(Icons.phone_outlined, size: 18),
-                  label: Text(AppLocalizations.of(context)!.svcCall),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.textPrimary,
-                    side: const BorderSide(color: AppColors.border),
-                    padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
-                  ),
-                ),
-              ),
-              const SizedBox(width: Spacing.sm),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      '/services/map',
-                      arguments: {'centerId': center.id, 'autoNavigate': true},
-                    );
-                  },
-                  icon: const Icon(Icons.near_me_outlined, size: 18),
-                  label: Text(AppLocalizations.of(context)!.svcRoute),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.textPrimary,
-                    side: const BorderSide(color: AppColors.border),
-                    padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
-                  ),
-                ),
-              ),
-            ],
+              );
+            },
+            onCall: () => _callCenter(context, center.phone),
+            onRoute: () {
+              Navigator.of(context).pushNamed(
+                '/services/map',
+                arguments: {'centerId': center.id, 'autoNavigate': true},
+              );
+            },
+            onOnsite: () => _requestOnsite(context, center),
           ),
         ],
       ),
     );
+  }
+
+  static Future<void> _requestOnsite(
+    BuildContext context,
+    ServiceCenter center,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+
+    try {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.mapOnsiteLocationBody)),
+        );
+        return;
+      }
+
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      if (!context.mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => BookServiceWizardPage(
+            center: center,
+            isOnsite: true,
+            serviceLatitude: pos.latitude,
+            serviceLongitude: pos.longitude,
+          ),
+        ),
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.mapOnsiteLocationBody)),
+      );
+    }
   }
 
   static Future<void> _callCenter(BuildContext context, String rawPhone) async {

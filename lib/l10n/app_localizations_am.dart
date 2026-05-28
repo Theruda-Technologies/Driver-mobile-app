@@ -1128,7 +1128,13 @@ class AppLocalizationsAm extends AppLocalizations {
   String get svcOpen => 'ክፍት';
 
   @override
+  String get svcBookAhead => 'ቀደም ብለው ይያዙ';
+
+  @override
   String get svcClosed => 'ዝግ';
+
+  @override
+  String get svcOnsiteAvailable => 'በቦታ ላይ አገልግሎት ይገኛል';
 
   @override
   String get svcViewReviews => 'ግምገማዎችን አሳይ';

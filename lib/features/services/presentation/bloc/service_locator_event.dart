@@ -48,3 +48,13 @@ class UpdateVisibleCenters extends ServiceLocatorEvent {
 class RefreshNearbyGaragesRequested extends ServiceLocatorEvent {
   const RefreshNearbyGaragesRequested();
 }
+
+/// Map card / marker tap: reload profile + onsite + hours for one garage.
+class EnrichGarageCenterRequested extends ServiceLocatorEvent {
+  const EnrichGarageCenterRequested(this.centerId);
+
+  final String centerId;
+
+  @override
+  List<Object?> get props => [centerId];
+}

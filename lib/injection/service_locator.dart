@@ -28,6 +28,7 @@ import '../features/appointments/application/usecases/cancel_appointment_usecase
 import '../features/appointments/application/usecases/list_appointments_usecase.dart';
 import '../features/appointments/application/usecases/reschedule_appointment_usecase.dart';
 import '../features/appointments/presentation/bloc/appointments_bloc.dart';
+import '../features/services/application/usecases/enrich_garage_center_usecase.dart';
 import '../features/services/application/usecases/get_nearby_garages_usecase.dart';
 import '../features/services/data/datasources/service_locator_remote_datasource.dart';
 import '../features/services/data/datasources/service_locator_remote_datasource_impl.dart';
@@ -99,6 +100,7 @@ import '../features/education/data/repositories/education_repository_impl.dart';
 import '../features/education/domain/repositories/education_repository.dart';
 import '../features/education/application/usecases/list_education_articles_usecase.dart';
 import '../features/education/application/usecases/search_education_articles_usecase.dart';
+import '../features/education/application/usecases/get_education_article_image_usecase.dart';
 import '../features/education/application/usecases/get_education_article_usecase.dart';
 import '../features/education/presentation/bloc/education_bloc.dart';
 import '../features/ai/data/ai_api_client.dart';
@@ -228,8 +230,14 @@ Future<void> setupServiceLocator() async {
   getIt.registerLazySingleton(
     () => GetNearbyGaragesUseCase(getIt<ServiceLocatorRepository>()),
   );
+  getIt.registerLazySingleton(
+    () => EnrichGarageCenterUseCase(getIt<ServiceLocatorRepository>()),
+  );
   getIt.registerFactory(
-    () => ServiceLocatorBloc(getIt<GetNearbyGaragesUseCase>()),
+    () => ServiceLocatorBloc(
+      getIt<GetNearbyGaragesUseCase>(),
+      getIt<EnrichGarageCenterUseCase>(),
+    ),
   );
 
   // Map (user location, map type, live tracking)
@@ -440,6 +448,9 @@ Future<void> setupServiceLocator() async {
   );
   getIt.registerLazySingleton(
     () => GetEducationArticleUseCase(getIt<EducationRepository>()),
+  );
+  getIt.registerLazySingleton(
+    () => GetEducationArticleImageUseCase(getIt<EducationRepository>()),
   );
   getIt.registerFactory(
     () => EducationBloc(

@@ -7,6 +7,7 @@ import '../../domain/entities/service_center.dart';
 import '../../domain/errors/service_locator_failure.dart';
 import '../../domain/repositories/service_locator_repository.dart';
 import '../datasources/service_locator_remote_datasource.dart';
+import '../models/garage_card_json.dart';
 
 class ServiceLocatorRepositoryImpl implements ServiceLocatorRepository {
   ServiceLocatorRepositoryImpl(this._remote);
@@ -32,6 +33,26 @@ class ServiceLocatorRepositoryImpl implements ServiceLocatorRepository {
       );
     } catch (e) {
       throw ServiceLocatorException('Unable to load nearby garages.');
+    }
+  }
+
+  @override
+  Future<ServiceCenter> enrichGarageCenter(ServiceCenter center) async {
+    try {
+      final model = await _remote.enrichGarage(
+        center.id,
+        garageSeedFromCenter(center),
+      );
+      return model.toEntity();
+    } on DioException catch (e) {
+      throw ServiceLocatorException(
+        ApiErrorMessages.from(
+          e,
+          fallback: 'Unable to load garage details.',
+        ),
+      );
+    } catch (e) {
+      throw ServiceLocatorException('Unable to load garage details.');
     }
   }
 }

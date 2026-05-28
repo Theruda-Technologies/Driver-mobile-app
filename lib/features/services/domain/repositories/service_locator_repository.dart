@@ -9,4 +9,7 @@ abstract class ServiceLocatorRepository {
     double? latitude,
     double? longitude,
   });
+
+  /// Refreshes one garage from GET /garages/{id}/profile (+ nearby seed).
+  Future<ServiceCenter> enrichGarageCenter(ServiceCenter center);
 }

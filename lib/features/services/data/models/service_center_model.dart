@@ -1,6 +1,8 @@
 library;
 
 import '../../domain/entities/service_center.dart';
+import '../../domain/utils/garage_open_status.dart';
+import 'garage_availability_parser.dart';
 
 class ServiceCenterModel {
   const ServiceCenterModel({
@@ -54,18 +56,18 @@ class ServiceCenterModel {
         }
       }
     }
-    // Prefer dedicated availability payload; fallback to nearby's availabilitySlots.
-    final slotsRaw = json['availability'] ?? json['availabilitySlots'];
-    final slots = <GarageAvailabilitySlotModel>[];
-    if (slotsRaw is List) {
-      for (final e in slotsRaw) {
-        if (e is Map) {
-          slots.add(
-            GarageAvailabilitySlotModel.fromJson(Map<String, dynamic>.from(e)),
-          );
-        }
-      }
-    }
+    final parsedSlots = GarageAvailabilityParser.parseSlots(
+      json['availability'] ?? json['availabilitySlots'],
+    );
+    final slots = parsedSlots
+        .map(
+          (s) => GarageAvailabilitySlotModel(
+            dayOfWeek: s.dayOfWeek,
+            startMinute: s.startMinute,
+            endMinute: s.endMinute,
+          ),
+        )
+        .toList();
     return ServiceCenterModel(
       id: json['id']?.toString() ?? '',
       name:
@@ -84,10 +86,15 @@ class ServiceCenterModel {
       longitude: _toDouble(json['longitude'] ?? json['lng'], 0.0),
       rating: _toDouble(json['rating'], 0.0),
       reviewsCount: _toInt(json['reviewsCount'] ?? json['reviewCount'], 0),
-      distanceMiles: _toDouble(json['distanceMiles'] ?? json['distance'], 0.0),
-      isOpen: json['isOpen'] == true,
-      isRegistered: json['isRegistered'] == true,
-      onsiteServiceEnabled: json['onsiteServiceEnabled'] == true,
+      distanceMiles: _toDouble(
+        json['distanceMiles'] ?? json['distanceKm'] ?? json['distance'],
+        0.0,
+      ),
+      isOpen:
+          json['isOpen'] == true ||
+          (parsedSlots.isNotEmpty && GarageOpenStatus.isOpenNow(parsedSlots)),
+      isRegistered: json['isRegistered'] != false,
+      onsiteServiceEnabled: GarageAvailabilityParser.parseOnsiteEnabled(json),
       services: services,
       availabilitySlots: slots,
     );

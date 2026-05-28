@@ -14,10 +14,14 @@ class ServiceLocatorPageWrapper extends StatelessWidget {
   final String? initialCenterId;
   final bool autoNavigate;
 
+  /// When opening map from the service list, pass the same bloc so cards match.
+  final ServiceLocatorBloc? serviceLocatorBloc;
+
   const ServiceLocatorPageWrapper({
     super.key,
     this.initialCenterId,
     this.autoNavigate = false,
+    this.serviceLocatorBloc,
   });
 
   @override
@@ -25,9 +29,10 @@ class ServiceLocatorPageWrapper extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => getIt<MapBloc>()),
-        BlocProvider(
-          create: (_) => getIt<ServiceLocatorBloc>(),
-        ),
+        if (serviceLocatorBloc != null)
+          BlocProvider<ServiceLocatorBloc>.value(value: serviceLocatorBloc!)
+        else
+          BlocProvider(create: (_) => getIt<ServiceLocatorBloc>()),
         BlocProvider(
           create: (_) =>
               getIt<AppointmentsBloc>()..add(const AppointmentsLoadRequested()),

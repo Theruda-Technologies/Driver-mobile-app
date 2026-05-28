@@ -15,6 +15,7 @@ import '../../../../core/widgets/simple_back_app_bar.dart';
 import '../../../../injection/service_locator.dart';
 import '../../application/usecases/get_education_article_usecase.dart';
 import '../../domain/entities/education_article.dart';
+import '../widgets/education_article_image.dart';
 import '../widgets/education_bottom_nav_bar.dart';
 
 class EducationArticleDetailPage extends StatefulWidget {
@@ -115,6 +116,13 @@ class _EducationArticleDetailPageState extends State<EducationArticleDetailPage>
                         ),
                       ],
                     ),
+                    const SizedBox(height: Spacing.md),
+                    EducationArticleImage(
+                      articleId: article.id,
+                      hasImage: article.hasImage,
+                      height: 200,
+                      borderRadius: BorderRadius.circular(BorderRadiusValues.xl),
+                    ),
                     const SizedBox(height: Spacing.lg),
                     if (isManual && pdfUrl != null) ...[
                       SizedBox(
@@ -164,9 +172,6 @@ class _EducationArticleDetailPageState extends State<EducationArticleDetailPage>
       return fromManual;
     }
 
-    final fromImage = article.imageUrl?.trim();
-    if (fromImage != null && _isPdfUrl(fromImage)) return fromImage;
-
     final text = article.description;
     final regex = RegExp(
       r'https?:\/\/[^\s<>"()]+\.pdf(?:\?[^\s<>"()]*)?',
@@ -174,12 +179,6 @@ class _EducationArticleDetailPageState extends State<EducationArticleDetailPage>
     );
     final match = regex.firstMatch(text);
     return match?.group(0);
-  }
-
-  bool _isPdfUrl(String value) {
-    final lower = value.toLowerCase();
-    final hasHttp = lower.startsWith('http://') || lower.startsWith('https://');
-    return hasHttp && lower.contains('.pdf');
   }
 
   Future<void> _openPdf(BuildContext context, String url) async {

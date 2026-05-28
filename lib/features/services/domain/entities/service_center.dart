@@ -2,6 +2,8 @@ library;
 
 import 'package:equatable/equatable.dart';
 
+import '../utils/garage_open_status.dart';
+
 /// A service offered by a garage ([id] from [GarageService] on the backend).
 class GarageOfferedService extends Equatable {
   const GarageOfferedService({required this.id, required this.name});
@@ -47,6 +49,25 @@ class ServiceCenter extends Equatable {
     required this.services,
     this.availabilitySlots = const [],
   });
+
+  /// Within today's operating window (local time; same rules as booking step 3).
+  bool get isOpenNow {
+    if (availabilitySlots.isNotEmpty) {
+      return GarageOpenStatus.isOpenNow(availabilitySlots);
+    }
+    // Hours not on card yet — trust API flag from enriched nearby payload.
+    if (isOpen) return true;
+    return false;
+  }
+
+  /// Future booking is possible (schedule loaded or garage is on-platform).
+  bool get acceptsBookings => GarageOpenStatus.acceptsBookings(
+        slots: availabilitySlots,
+        isRegistered: isRegistered,
+      );
+
+  /// On-site requests when garage settings allow it and doors are open now.
+  bool get canRequestOnsite => onsiteServiceEnabled && isOpenNow;
 
   ServiceCenter copyWith({
     String? id,

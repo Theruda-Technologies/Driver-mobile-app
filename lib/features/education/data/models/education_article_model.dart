@@ -9,7 +9,7 @@ class EducationArticleModel {
     required this.title,
     required this.description,
     required this.category,
-    this.imageUrl,
+    this.hasImage = false,
     this.manualUrl,
     required this.createdAt,
     required this.updatedAt,
@@ -19,7 +19,7 @@ class EducationArticleModel {
   final String title;
   final String description;
   final EducationCategory category;
-  final String? imageUrl;
+  final bool hasImage;
   final String? manualUrl;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -30,11 +30,24 @@ class EducationArticleModel {
       title: json['title']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
       category: _parseCategory(json['category']?.toString()),
-      imageUrl: _normalizeUrl(json['image']?.toString()),
+      hasImage: _parseHasImage(json),
       manualUrl: _extractManualUrl(json),
       createdAt: _parseDate(json['createdAt']) ?? DateTime.fromMillisecondsSinceEpoch(0),
       updatedAt: _parseDate(json['updatedAt']) ?? DateTime.fromMillisecondsSinceEpoch(0),
     );
+  }
+
+  static bool _parseHasImage(Map<String, dynamic> json) {
+    final direct = json['hasImage'] ?? json['has_image'];
+    if (direct is bool) return direct;
+    if (direct is num) return direct != 0;
+    if (direct is String) {
+      final s = direct.toLowerCase().trim();
+      if (s == 'true' || s == '1') return true;
+      if (s == 'false' || s == '0') return false;
+    }
+    final image = json['image'] ?? json['imageUrl'] ?? json['image_url'];
+    return image != null && image.toString().trim().isNotEmpty;
   }
 
   static String? _extractManualUrl(Map<String, dynamic> json) {
@@ -54,13 +67,13 @@ class EducationArticleModel {
     for (final raw in candidates) {
       final value = raw?.toString().trim();
       if (value != null && value.isNotEmpty) {
-        return _normalizeUrl(value);
+        return _normalizeUrl(value, kind: _UrlKind.pdf);
       }
     }
     return null;
   }
 
-  static String? _normalizeUrl(String? raw) {
+  static String? _normalizeUrl(String? raw, {_UrlKind kind = _UrlKind.image}) {
     final value = raw?.trim().replaceAll('\\', '/');
     if (value == null || value.isEmpty) return null;
     final uri = Uri.tryParse(value);
@@ -77,11 +90,18 @@ class EducationArticleModel {
       }
       return value;
     }
-    final base = ApiEndpoints.baseUrl;
-    // Backend often stores manual PDFs as bare filenames in /uploads.
-    final looksLikeBareFilename =
-        !value.contains('/') && value.toLowerCase().endsWith('.pdf');
-    if (looksLikeBareFilename) return '$base/uploads/$value';
+    final base = ApiEndpoints.baseUrl.replaceAll(RegExp(r'/$'), '');
+    if (value.startsWith('/uploads/')) return '$base$value';
+    if (value.startsWith('uploads/')) return '$base/$value';
+
+    final looksLikeBareFilename = !value.contains('/');
+    if (looksLikeBareFilename) {
+      if (value.toLowerCase().endsWith('.pdf') || kind == _UrlKind.pdf) {
+        return '$base/uploads/education-manuals/$value';
+      }
+      return '$base/uploads/education-images/$value';
+    }
+
     if (value.startsWith('/')) return '$base$value';
     return '$base/$value';
   }
@@ -114,9 +134,11 @@ class EducationArticleModel {
         title: title,
         description: description,
         category: category,
-        imageUrl: imageUrl,
+        hasImage: hasImage,
         manualUrl: manualUrl,
         createdAt: createdAt,
         updatedAt: updatedAt,
       );
 }
+
+enum _UrlKind { image, pdf }

@@ -147,8 +147,31 @@ class MockBackend extends Interceptor {
         }),
       );
     }
-    if (method == 'GET' && path.startsWith('/driver/education')) {
+    if (method == 'GET' &&
+        RegExp(r'^/driver/education/[^/]+/image$').hasMatch(path)) {
+      return handler.resolve(
+        Response<dynamic>(
+          requestOptions: RequestOptions(path: path),
+          statusCode: 404,
+          data: <String, dynamic>{'message': 'Image not found'},
+        ),
+      );
+    }
+    if (method == 'GET' && path == '/driver/education') {
       return handler.resolve(ok(<dynamic>[]));
+    }
+    if (method == 'GET' && path.startsWith('/driver/education/search')) {
+      return handler.resolve(ok(<dynamic>[]));
+    }
+    if (method == 'GET' &&
+        RegExp(r'^/driver/education/[^/]+$').hasMatch(path)) {
+      return handler.resolve(
+        Response<dynamic>(
+          requestOptions: RequestOptions(path: path),
+          statusCode: 404,
+          data: <String, dynamic>{'message': 'Not found'},
+        ),
+      );
     }
     if (method == 'GET' && path.startsWith('/education/content')) {
       return handler.resolve(ok(<dynamic>[]));
@@ -166,6 +189,19 @@ class MockBackend extends Interceptor {
       return handler.resolve(
         ok(<String, Object?>{'averageRating': 4.5, 'totalRatings': 12}),
       );
+    }
+    if (method == 'GET' &&
+        path.contains('/garages/availability/') &&
+        path.endsWith('/slots')) {
+      return handler.resolve(ok(_mockAvailabilitySlots()));
+    }
+    if (method == 'GET' &&
+        RegExp(r'^/garages/[^/]+/profile$').hasMatch(path)) {
+      return handler.resolve(ok(_mockGarageProfile()));
+    }
+    if (method == 'GET' &&
+        RegExp(r'^/garages/[^/]+/services$').hasMatch(path)) {
+      return handler.resolve(ok(_mockGarageServices()));
     }
     if (method == 'GET' && path.startsWith('/garages/')) {
       return handler.resolve(ok(<dynamic>[]));
@@ -221,15 +257,64 @@ class MockBackend extends Interceptor {
         'id': 'g1',
         'name': 'Test Garage',
         'address': 'Addis Ababa',
+        'subtitle': 'Addis Ababa',
         'phone': '+251911000000',
         'latitude': 9.03,
         'longitude': 38.74,
         'rating': 4.5,
         'reviewsCount': 12,
-        'distanceMiles': 1.2,
+        'distanceKm': 1.2,
         'isOpen': true,
-        'services': <String>['Oil Change'],
+        'isRegistered': true,
+        'onsiteServiceEnabled': true,
+        'availabilitySlots': _mockAvailabilitySlots(),
+        'services': <Map<String, String>>[
+          <String, String>{'id': 'svc1', 'name': 'Oil Change'},
+        ],
       };
+
+  Map<String, Object?> _mockGarageProfile() => <String, Object?>{
+        'id': 'g1',
+        'name': 'Test Garage',
+        'services': _mockGarageServices(),
+        'availabilitySlots': _mockAvailabilitySlots(),
+        'setting': <String, Object?>{
+          'data': <String, Object?>{'onsiteServiceEnabled': true},
+        },
+        'rating': <String, Object?>{'averageRating': 4.5, 'totalRatings': 12},
+      };
+
+  List<Map<String, String>> _mockGarageServices() => <Map<String, String>>[
+        <String, String>{'id': 'svc1', 'name': 'Oil Change'},
+      ];
+
+  List<Map<String, Object>> _mockAvailabilitySlots() => <Map<String, Object>>[
+        <String, Object>{
+          'dayOfWeek': 'MONDAY',
+          'startMinute': 540,
+          'endMinute': 1020,
+        },
+        <String, Object>{
+          'dayOfWeek': 'TUESDAY',
+          'startMinute': 540,
+          'endMinute': 1020,
+        },
+        <String, Object>{
+          'dayOfWeek': 'WEDNESDAY',
+          'startMinute': 540,
+          'endMinute': 1020,
+        },
+        <String, Object>{
+          'dayOfWeek': 'THURSDAY',
+          'startMinute': 540,
+          'endMinute': 1020,
+        },
+        <String, Object>{
+          'dayOfWeek': 'FRIDAY',
+          'startMinute': 540,
+          'endMinute': 1020,
+        },
+      ];
 
   Map<String, Object?> _mockVehicle() => <String, Object?>{
         'id': 'v1',

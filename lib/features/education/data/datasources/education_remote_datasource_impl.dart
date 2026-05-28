@@ -1,5 +1,7 @@
 library;
 
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 
 import '../../../../core/constants/api_endpoints.dart';
@@ -10,6 +12,7 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
   EducationRemoteDataSourceImpl(this._dio);
 
   final Dio _dio;
+  static final Map<String, Uint8List> _imageCache = {};
 
   List<EducationArticleModel> _parseList(dynamic data) {
     final list = _extractList(data);
@@ -89,6 +92,27 @@ class EducationRemoteDataSourceImpl implements EducationRemoteDataSource {
       type: DioExceptionType.unknown,
       error: 'Invalid education article response shape',
     );
+  }
+
+  @override
+  Future<Uint8List?> fetchArticleImageBytes(String articleId) async {
+    final cached = _imageCache[articleId];
+    if (cached != null) return cached;
+
+    try {
+      final res = await _dio.get<List<int>>(
+        ApiEndpoints.driverEducationImage(articleId),
+        options: Options(responseType: ResponseType.bytes),
+      );
+      final data = res.data;
+      if (data == null || data.isEmpty) return null;
+      final bytes = Uint8List.fromList(data);
+      _imageCache[articleId] = bytes;
+      return bytes;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return null;
+      rethrow;
+    }
   }
 
   Future<dynamic> _getFirstSuccessful({

@@ -1148,7 +1148,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get svcOpen => 'Open';
 
   @override
+  String get svcBookAhead => 'Book ahead';
+
+  @override
   String get svcClosed => 'Closed';
+
+  @override
+  String get svcOnsiteAvailable => 'On-site service available';
 
   @override
   String get svcViewReviews => 'View reviews';
