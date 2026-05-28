@@ -98,18 +98,12 @@ String testJwt() {
 /// Dio interceptor that resolves every request with canned JSON.
 class MockBackend extends Interceptor {
   @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final path = _normalize(options.path);
     final method = options.method.toUpperCase();
 
-    Response<dynamic> ok(Object? body) => Response<dynamic>(
-          requestOptions: options,
-          statusCode: 200,
-          data: body,
-        );
+    Response<dynamic> ok(Object? body) =>
+        Response<dynamic>(requestOptions: options, statusCode: 200, data: body);
 
     if (method == 'GET' && path == '/driver/vehicles') {
       return handler.resolve(ok(<Map<String, Object?>>[_mockVehicle()]));
@@ -195,8 +189,7 @@ class MockBackend extends Interceptor {
         path.endsWith('/slots')) {
       return handler.resolve(ok(_mockAvailabilitySlots()));
     }
-    if (method == 'GET' &&
-        RegExp(r'^/garages/[^/]+/profile$').hasMatch(path)) {
+    if (method == 'GET' && RegExp(r'^/garages/[^/]+/profile$').hasMatch(path)) {
       return handler.resolve(ok(_mockGarageProfile()));
     }
     if (method == 'GET' &&
@@ -254,80 +247,80 @@ class MockBackend extends Interceptor {
   }
 
   Map<String, Object?> _mockGarage() => <String, Object?>{
-        'id': 'g1',
-        'name': 'Test Garage',
-        'address': 'Addis Ababa',
-        'subtitle': 'Addis Ababa',
-        'phone': '+251911000000',
-        'latitude': 9.03,
-        'longitude': 38.74,
-        'rating': 4.5,
-        'reviewsCount': 12,
-        'distanceKm': 1.2,
-        'isOpen': true,
-        'isRegistered': true,
-        'onsiteServiceEnabled': true,
-        'availabilitySlots': _mockAvailabilitySlots(),
-        'services': <Map<String, String>>[
-          <String, String>{'id': 'svc1', 'name': 'Oil Change'},
-        ],
-      };
+    'id': 'g1',
+    'name': 'Test Garage',
+    'address': 'Addis Ababa',
+    'subtitle': 'Addis Ababa',
+    'phone': '+251911000000',
+    'latitude': 9.03,
+    'longitude': 38.74,
+    'rating': 4.5,
+    'reviewsCount': 12,
+    'distanceKm': 1.2,
+    'isOpen': true,
+    'isRegistered': true,
+    'onsiteServiceEnabled': true,
+    'availabilitySlots': _mockAvailabilitySlots(),
+    'services': <Map<String, String>>[
+      <String, String>{'id': 'svc1', 'name': 'Oil Change'},
+    ],
+  };
 
   Map<String, Object?> _mockGarageProfile() => <String, Object?>{
-        'id': 'g1',
-        'name': 'Test Garage',
-        'services': _mockGarageServices(),
-        'availabilitySlots': _mockAvailabilitySlots(),
-        'setting': <String, Object?>{
-          'data': <String, Object?>{'onsiteServiceEnabled': true},
-        },
-        'rating': <String, Object?>{'averageRating': 4.5, 'totalRatings': 12},
-      };
+    'id': 'g1',
+    'name': 'Test Garage',
+    'services': _mockGarageServices(),
+    'availabilitySlots': _mockAvailabilitySlots(),
+    'setting': <String, Object?>{
+      'data': <String, Object?>{'onsiteServiceEnabled': true},
+    },
+    'rating': <String, Object?>{'averageRating': 4.5, 'totalRatings': 12},
+  };
 
   List<Map<String, String>> _mockGarageServices() => <Map<String, String>>[
-        <String, String>{'id': 'svc1', 'name': 'Oil Change'},
-      ];
+    <String, String>{'id': 'svc1', 'name': 'Oil Change'},
+  ];
 
   List<Map<String, Object>> _mockAvailabilitySlots() => <Map<String, Object>>[
-        <String, Object>{
-          'dayOfWeek': 'MONDAY',
-          'startMinute': 540,
-          'endMinute': 1020,
-        },
-        <String, Object>{
-          'dayOfWeek': 'TUESDAY',
-          'startMinute': 540,
-          'endMinute': 1020,
-        },
-        <String, Object>{
-          'dayOfWeek': 'WEDNESDAY',
-          'startMinute': 540,
-          'endMinute': 1020,
-        },
-        <String, Object>{
-          'dayOfWeek': 'THURSDAY',
-          'startMinute': 540,
-          'endMinute': 1020,
-        },
-        <String, Object>{
-          'dayOfWeek': 'FRIDAY',
-          'startMinute': 540,
-          'endMinute': 1020,
-        },
-      ];
+    <String, Object>{
+      'dayOfWeek': 'MONDAY',
+      'startMinute': 540,
+      'endMinute': 1020,
+    },
+    <String, Object>{
+      'dayOfWeek': 'TUESDAY',
+      'startMinute': 540,
+      'endMinute': 1020,
+    },
+    <String, Object>{
+      'dayOfWeek': 'WEDNESDAY',
+      'startMinute': 540,
+      'endMinute': 1020,
+    },
+    <String, Object>{
+      'dayOfWeek': 'THURSDAY',
+      'startMinute': 540,
+      'endMinute': 1020,
+    },
+    <String, Object>{
+      'dayOfWeek': 'FRIDAY',
+      'startMinute': 540,
+      'endMinute': 1020,
+    },
+  ];
 
   Map<String, Object?> _mockVehicle() => <String, Object?>{
-        'id': 'v1',
-        '_id': 'v1',
-        'driverId': 'test-user-id',
-        'plateNumber': 'AA-12345',
-        'make': 'Toyota',
-        'model': 'Corolla',
-        'year': 2020,
-        'color': 'White',
-        'fuelType': 'Petrol',
-        'mileage': 50000,
-      };
+    'id': 'v1',
+    '_id': 'v1',
+    'driverId': 'test-user-id',
+    'plateNumber': 'AA-12345',
+    'make': 'Toyota',
+    'model': 'Corolla',
+    'year': 2020,
+    'color': 'White',
+    'fuelType': 'Petrol',
+    'mileage': 50000,
+  };
 }
 
 /// Asserts the app booted to dashboard, not login.
