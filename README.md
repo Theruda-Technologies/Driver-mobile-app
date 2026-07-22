@@ -54,12 +54,6 @@ flutter build apk    # Android
 flutter build ios    # iOS (Mac + Xcode)
 ```
 
-## Team
-
-- Bethel Dereje, Soliyana Kewani — software  
-- Elizabet Yonas, Heran Eshetu, Yordanos Melaku — AI  
-- Advisor: Mr. Michael Sheleme  
-
 ## License
 
 Add your license here.
